@@ -1,1 +1,1 @@
-# Gordo0.ChunkyMonkey.CodeGenerator
+# Gord0.ChunkyMonkey.CodeGenerator
