@@ -2,7 +2,7 @@
 
 ## Introduction
 
-![ChunkyMonkey](https://raw.githubusercontent.com/andrew-gordon/ChunkyMonkey/main/media/ChunkMonkey.png)
+![ChunkyMonkey](https://raw.githubusercontent.com/andrew-gordon/Gordo0.ChunkyMonkey.CodeGenerator/main/media/ChunkMonkey.png)
 ChunkyMonkey is a C# code generator that generates code, at build time, to split an object containing collection properties into chunks. It also provides the ability to merge the chunks back into a single object instance.
 
 ## Supported collection types
@@ -241,14 +241,6 @@ This generated method merges a set of chunks back into a single instance.
 
 <br>
 
-## Limitations
-
-<br>
-
-## Future Enhancements
-
-* Handle nullable reference types
-
 ## Versions
 
 | Version | Description |
@@ -261,3 +253,4 @@ This generated method merges a set of chunks back into a single instance.
 | ...  | ... |
 | 1.0.38  | Minor fixes and documentation updates |
 | 1.0.45  | CodeGenerator rewritten to use INamedTypeSymbol and IPropertySymbol, rather than ClassDeclaration. Support for nullable types. Improved generic type handling. Updated documentation. |
+| 2.0.3   | Refactored |
