@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>Latest</LangVersion>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<IsRoslynComponent>true</IsRoslynComponent>
+		<PackageId>Gord0.ChunkyMonkey.CodeGenerator</PackageId>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<Version>1.0.0</Version>
+		<Authors>Andrew Gordon</Authors>
+		<Description>ChunkyMonkey is a C# code generator that generates code, at build time, to split an object containing collection properties (arrays, lists, dictionaries etc) into chunks. It also provides the ability to merge the chunks back into a single object instance.</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/andrew-gordon/ChunkyMonkey</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/andrew-gordon/ChunkyMonkey</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<Copyright>© Andrew Gordon 2024</Copyright>
+		<PackageReleaseNotes>Initial release</PackageReleaseNotes>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<PackageIcon>icon.png</PackageIcon>
+		<contentFiles>
+		</contentFiles>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis" Version="4.11.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
+		<!--<PackageReference Include="Nerdbank.GitVersioning" Version="3.6.143">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>-->
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="/" />
+		<None Include="$(OutputPath)\Gord0.ChunkyMonkey.CodeGenerator.dll"  Pack="true" PackagePath="analyzers/dotnet/cs" />
+		<None Include="..\..\media\icon.png" Pack="true" PackagePath="/" />
+	</ItemGroup>
+</Project>
