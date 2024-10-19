@@ -13,8 +13,8 @@
 		<Authors>Andrew Gordon</Authors>
 		<Description>ChunkyMonkey is a C# code generator that generates code, at build time, to split an object containing collection properties (arrays, lists, dictionaries etc) into chunks. It also provides the ability to merge the chunks back into a single object instance.</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/andrew-gordon/ChunkyMonkey</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/andrew-gordon/ChunkyMonkey</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/andrew-gordon/Gord0.ChunkyMonkey.CodeGenerator</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/andrew-gordon/Gord0.ChunkyMonkey.CodeGenerator</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<Copyright>© Andrew Gordon 2024</Copyright>
 		<PackageReleaseNotes>Initial release</PackageReleaseNotes>
