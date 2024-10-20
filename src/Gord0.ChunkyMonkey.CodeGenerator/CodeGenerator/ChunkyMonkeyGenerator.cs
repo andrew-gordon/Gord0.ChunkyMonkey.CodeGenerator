@@ -7,6 +7,9 @@ using System.Text;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 {
+    /// <summary>
+    /// ChunkyMonkeyGenerator.
+    /// </summary>
     [Generator(LanguageNames.CSharp)]
     public class ChunkyMonkeyGenerator : IIncrementalGenerator
     {
@@ -27,8 +30,8 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
                         var classSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
 
                         bool requiresChunking = classSymbol != null &&
-                            (GetAttributeForSymbol(AttributeFullTypeNames.ChunkAttribute, classSymbol) is not null ||
-                            IsAttributeAppliedToAnyProperty(AttributeFullTypeNames.ChunkMemberAttribute, classSymbol));
+                            (GetAttributeForSymbol(AttributeFullTypeNames.Chunk, classSymbol) is not null ||
+                            IsAttributeAppliedToAnyProperty(AttributeFullTypeNames.ChunkMember, classSymbol));
 
                         return new ClassRecord(classDeclarationSyntax, classSymbol!, requiresChunking);
                     })
@@ -50,6 +53,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             });
         }
 
+        /// <summary>
+        /// Checks if the property symbol represents a generic type with the specified type name.
+        /// </summary>
+        /// <param name="propertySymbol">The property symbol to check.</param>
+        /// <param name="typeName">The type name to match.</param>
+        /// <returns>True if the property symbol represents a generic type with the specified type name, otherwise false.</returns>
         private bool IsGenericType(IPropertySymbol propertySymbol, string typeName)
         {
             if (propertySymbol.Type is INamedTypeSymbol namedType && namedType.IsGenericType)
@@ -61,13 +70,18 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             return false;
         }
 
+        /// <summary>
+        /// Generates the chunking code for a class record.
+        /// </summary>
+        /// <param name="classRecord">The class record to generate the code for.</param>
+        /// <returns>The generated chunking code.</returns>
         private string GenerateChunkingCode(ClassRecord classRecord)
         {
             var className = classRecord.Name;
             var namespaceText = classRecord.Namespace ?? "Unknown_Namespace";
             var sealedModifier = classRecord.IsSealed ? "sealed " : string.Empty;
 
-            var classChunkAttribute = GetAttributeForSymbol(AttributeFullTypeNames.ChunkAttribute, classRecord.ClassSymbol);
+            var classChunkAttribute = GetAttributeForSymbol(AttributeFullTypeNames.Chunk, classRecord.ClassSymbol);
 
             var typeRules = new List<TypeRecord>();
             var chunkCodeFactory = new ChunkCodeFactory();
@@ -136,8 +150,6 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             sb.AppendLine($"namespace {namespaceText}");
             sb.AppendLine("{");
 
-            // use same namespace as the original class
-
             sb.AppendLine($"    public {sealedModifier}partial class {className}");
             sb.AppendLine("    {");
             sb.AppendLine("        /// <summary>");
@@ -148,10 +160,8 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             sb.AppendLine("        public IEnumerable<" + className + "> Chunk(int chunkSize)");
             sb.AppendLine("        {");
 
-            sb.AppendLine($"            // Find the length of the biggest collecion.");
+            sb.AppendLine($"            // Find the length of the biggest collection.");
             sb.AppendLine($"            int biggestCollectionLength = 0;");
-
-            // Loop through properties and generate chunking logic for collection properties
 
             var properties = classRecord.Properties
                 .Select(p => new
@@ -181,13 +191,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             sb.AppendLine($"            {{");
             sb.AppendLine($"                var instance = new {className}();");
 
-            // Loop through properties and generate chunking logic for collection properties
             foreach (var propertySymbolWithRule in properties)
             {
                 var p = propertySymbolWithRule.PropertySymbol;
                 var r = propertySymbolWithRule.TypeRule;
 
-                var chunkMemberAttribute = GetAttributeForSymbol(AttributeFullTypeNames.ChunkMemberAttribute, p);
+                var chunkMemberAttribute = GetAttributeForSymbol(AttributeFullTypeNames.ChunkMember, p);
                 var propertyIsPublic = p.DeclaredAccessibility == Accessibility.Public;
                 var memberToBeChunked = propertyIsPublic && (chunkMemberAttribute is not null || classChunkAttribute is not null);
 
@@ -207,8 +216,6 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             sb.AppendLine($"        }}");
             sb.AppendLine("");
 
-            // Code to merge chunks
-
             sb.AppendLine($"        /// <summary>");
             sb.AppendLine($"        /// Merges the specified chunks into a single instance.");
             sb.AppendLine($"        /// </summary>");
@@ -221,14 +228,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             sb.AppendLine($"            foreach(var chunk in chunks)");
             sb.AppendLine($"            {{");
 
-            // Loop through properties and generate chunking logic for collection properties
-
             foreach (var propertySymbolWithRule in properties)
             {
                 var p = propertySymbolWithRule.PropertySymbol;
                 var r = propertySymbolWithRule.TypeRule;
 
-                var chunkMemberAttribute = GetAttributeForSymbol(AttributeFullTypeNames.ChunkMemberAttribute, p);
+                var chunkMemberAttribute = GetAttributeForSymbol(AttributeFullTypeNames.ChunkMember, p);
 
                 var memberToBeChecked = chunkMemberAttribute is not null || classChunkAttribute is not null;
                 if (memberToBeChecked && r is not null)
@@ -254,6 +259,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             return code;
         }
 
+        /// <summary>
+        /// Checks if the specified attribute is applied to any property of the class symbol.
+        /// </summary>
+        /// <param name="attributeFullTypeName">The full type name of the attribute.</param>
+        /// <param name="classSymbol">The class symbol to check.</param>
+        /// <returns>True if the attribute is applied to any property, otherwise false.</returns>
         private bool IsAttributeAppliedToAnyProperty(string attributeFullTypeName, INamedTypeSymbol classSymbol)
         {
             var propertySymbols = classSymbol
@@ -271,6 +282,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             return false;
         }
 
+        /// <summary>
+        /// Gets the attribute data for the specified attribute full type name and symbol.
+        /// </summary>
+        /// <param name="attributeFullTypeName">The full type name of the attribute.</param>
+        /// <param name="symbol">The symbol to check for the attribute.</param>
+        /// <returns>The attribute data if the attribute is found, otherwise null.</returns>
         private AttributeData GetAttributeForSymbol(string attributeFullTypeName, ISymbol symbol)
         {
             var result = symbol.GetAttributes()

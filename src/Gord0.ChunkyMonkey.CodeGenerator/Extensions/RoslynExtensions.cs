@@ -4,6 +4,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.Extensions
 {
+    /// <summary>
+    /// Roslyn extensions for syntax nodes.
+    /// </summary>
     public static class RoslynExtensions
     {
         /// <summary>

@@ -3,6 +3,9 @@ using System.Text;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 {
+    /// <summary>
+    /// Produces code to set the value of a property on an instance by merging the value of the property from a chunk.
+    /// </summary>
     internal class MergeChunksCodeFactory
     {
         internal string ForArrayProperty(IPropertySymbol propertySymbol, Func<IPropertySymbol, string?> newInstanceCommand)

@@ -2,7 +2,7 @@
 {
     internal static class AttributeFullTypeNames
     {
-        public const string ChunkAttribute = "Gord0.ChunkMonkey.Attributes.ChunkAttribute";
-        public const string ChunkMemberAttribute = "Gord0.ChunkMonkey.Attributes.ChunkMemberAttribute";
+        public const string Chunk = "Gord0.ChunkMonkey.Attributes.ChunkAttribute";
+        public const string ChunkMember = "Gord0.ChunkMonkey.Attributes.ChunkMemberAttribute";
     }
 }

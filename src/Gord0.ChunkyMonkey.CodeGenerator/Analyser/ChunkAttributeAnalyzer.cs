@@ -58,7 +58,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
 
             // Check if the class has the ChunkAttribute
             var hasCustomAttribute = classSymbol.GetAttributes().Any(attr =>
-                attr.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == AttributeFullTypeNames.ChunkAttribute);
+                attr.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == AttributeFullTypeNames.Chunk);
 
             if (!hasCustomAttribute)
             {
@@ -93,5 +93,4 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             }
         }
     }
-
 }

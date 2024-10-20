@@ -3,6 +3,9 @@ using System.Text;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 {
+    /// <summary>
+    /// Produces code to split a collection property into chunks.
+    /// </summary>
     internal class ChunkCodeFactory
     {
         internal string ForArrayProperty(IPropertySymbol propertySymbol)

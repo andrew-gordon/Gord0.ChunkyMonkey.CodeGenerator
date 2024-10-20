@@ -51,6 +51,7 @@ public TInstance MergeChunks(IEnumerable<TInstance> chunks)
 
 ## ```IEnumerable<TInstance> Chunk(int chunkSize)```
 
+* The chunk size is the maximum number of values held in chunked collection properties.
 * Only partial and non-static classes can be chunked. This is because the code generates generates a partial class containing the methods above for each chunked class.
 * Non-chunkable properties are repeated for each chunked instance.
 * If a collection (list, collection, array or dictionary) property's values are exhausted, subsequent chunks will contain an empty collection for the property value.
@@ -58,6 +59,8 @@ public TInstance MergeChunks(IEnumerable<TInstance> chunks)
 
 
 ### Example of usage
+
+- Let's examine the use of the `Chunk` method on the `CreateUserRequest` class with a chunk size of 3.
 
 #### Input to `Chunks(3)`
 

@@ -1,7 +1,18 @@
 ﻿namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Helpers
 {
+    /// <summary>
+    /// Helper class for comparing dictionaries.
+    /// </summary>
     internal class DictionaryComparer
     {
+        /// <summary>
+        /// Compares two dictionaries for equality.
+        /// </summary>
+        /// <typeparam name="TKey">The type of the keys in the dictionaries.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the dictionaries.</typeparam>
+        /// <param name="dict1">The first dictionary to compare.</param>
+        /// <param name="dict2">The second dictionary to compare.</param>
+        /// <returns><c>true</c> if the dictionaries are equal; otherwise, <c>false</c>.</returns>
         public static bool Compare<TKey, TValue>(Dictionary<TKey, TValue> dict1, Dictionary<TKey, TValue> dict2) where TKey : notnull
         {
             // Check if both dictionaries are null or the same reference
