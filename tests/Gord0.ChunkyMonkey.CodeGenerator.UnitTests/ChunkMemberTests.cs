@@ -3,7 +3,7 @@ using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.TestClasses.WithChunkMemberAttr
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
 {
-    public partial class ChunkMemberAttributeTests
+    public partial class ChunkMemberTests
     {
         [Fact]
         public void ChunkMember_ArrayProperty_ReturnsChunkedInstances()

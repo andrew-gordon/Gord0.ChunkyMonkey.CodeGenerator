@@ -90,7 +90,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
         public static readonly DiagnosticDescriptor NonSupportedChunkingTypeWithChunkMemberRule = new(
             "CMKY0008",
             "Invalid use of ChunkMemberAtribute on a member with a type that ChunkyMonkey cannot chunk",
-            "ChunkMemberAtribute cannot be applied to a member with a type that ChunkyMonkey cannot chunk. See https://github.com/andrew-gordon/Gord0.ChunkyMonkey.CodeGenerator for a list of supported types.",
+            "ChunkMemberAtribute cannot be applied to member '{0}' with a type that ChunkyMonkey cannot chunk ('{1}'). See https://github.com/andrew-gordon/Gord0.ChunkyMonkey.CodeGenerator for a list of supported types.",
             "Usage",
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);

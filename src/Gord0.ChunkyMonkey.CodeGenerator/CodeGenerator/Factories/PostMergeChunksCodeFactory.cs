@@ -28,5 +28,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             }
             return sb.ToString();
         }
+
+        internal string ForImmutableArrayProperty(PropertyRecord propertyRecord)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"            instance.{propertyRecord.Symbol.Name} = ({propertyRecord.TemporaryListVariableNameForArray} ?? []).ToImmutableArray();");
+            return sb.ToString();
+        }
     }
 }

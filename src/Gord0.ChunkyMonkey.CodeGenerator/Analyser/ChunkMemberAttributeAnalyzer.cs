@@ -86,9 +86,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
                 context.ReportDiagnostic(diagnostic);
             }
 
-            if (properties.Any(p => p.IsMemberDecoratedWithChunkMemberAttribute && !p.IsChunkable))
+            var propertiesWithUnsupportedChunkingTypes = properties.Where(p => p.IsMemberDecoratedWithChunkMemberAttribute && !p.HasSupportedTypeForChunking);
+
+            foreach(var property in propertiesWithUnsupportedChunkingTypes)
             {
-                var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NonSupportedChunkingTypeWithChunkMemberRule, classDeclaration.Identifier.GetLocation());
+                var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NonSupportedChunkingTypeWithChunkMemberRule, classDeclaration.Identifier.GetLocation(), property.Symbol.Name, 
+                    property.Symbol.Type.ToDisplayString(SymbolDisplayFormat.CSharpShortErrorMessageFormat));
                 context.ReportDiagnostic(diagnostic);
             }
         }

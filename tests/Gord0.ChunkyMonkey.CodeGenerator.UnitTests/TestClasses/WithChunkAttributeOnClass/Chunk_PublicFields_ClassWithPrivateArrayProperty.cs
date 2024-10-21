@@ -5,7 +5,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.TestClasses.WithChunkAttrib
     /// <summary>
     /// Represents a class with public fields and a private array property.
     /// </summary>
-    [Chunk(Accessibility.Public)]
+    [Chunk(Accessibility.All)]
     public sealed partial class Chunk_PublicFields_ClassWithPrivateArrayProperty
     {
         /// <summary>

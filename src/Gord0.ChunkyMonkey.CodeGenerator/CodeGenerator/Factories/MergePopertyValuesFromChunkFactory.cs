@@ -13,7 +13,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
         {
             var arrayTypeElement = propertyRecord.Symbol.Type is IArrayTypeSymbol arrayTypeSymbol
                ? arrayTypeSymbol.ElementType.Name
-               : throw new InvalidOperationException("ForNullableArrayProperty called for a property that doesn't have an array type.");
+               : throw new InvalidOperationException("ForArrayProperty called for a property that doesn't have an array type.");
 
             var sb = new StringBuilder();
             sb.AppendLine($"                if (chunk.{propertyRecord.Symbol.Name} is not null)");
@@ -25,6 +25,18 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"");
             sb.AppendLine($"                    {propertyRecord.TemporaryListVariableNameForArray}.AddRange(chunk.{propertyRecord.Symbol.Name});");
             sb.AppendLine($"                }}");
+            return sb.ToString();
+        }
+
+        internal string ForImmutableArrayProperty(PropertyRecord propertyRecord)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"                if ({propertyRecord.TemporaryListVariableNameForArray} is null)");
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableNameForArray} = [];");
+            sb.AppendLine($"                }}");
+            sb.AppendLine($"");
+            sb.AppendLine($"                {propertyRecord.TemporaryListVariableNameForArray}.AddRange(chunk.{propertyRecord.Symbol.Name});");
             return sb.ToString();
         }
 

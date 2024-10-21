@@ -8,11 +8,12 @@ ChunkyMonkey is a C# code generator that generates code, at build time, to split
 ## Supported collection types
 
 - `System.Array`
-- `System.Collections.Generic.List<T>`
-- `System.Collections.ObjectModel.Collection<T>`
 - `System.Collections.Generic.Dictionary<K,V>` 
+- `System.Collections.Generic.List<T>`
 - `System.Collections.Generic.HashSet<T>`
 - `System.Collections.Generic.SortedSet<T>` 
+- `System.Collections.Immutable.ImmutableArray<T>`
+- `System.Collections.ObjectModel.Collection<T>`
 
 ## Use Case
 
@@ -133,14 +134,20 @@ This generated method merges a set of chunks back into a single instance.
     > :bulb: **Tip:** Be sure to define the class as a `partial` class - otherwise, you will receive a compiler error when you build your project.
 
     ```csharp
-    using Gordo.ChunkyMonkey.Attributes
+    using Gord0.ChunkMonkey.Attributes;
 
     namespace TestProject
     {
         [Chunk]
         public partial class Person
         {
-            public string[] PhoneNumbers { get; set; }
+            public string? Name { get; set; }
+
+            public DateTime? DateOfBirth { get; set; }
+
+            public string[]? PhoneNumbers { get; set; }
+
+            public List<string>? RecentAddresses { get; set; }
         }
     }
     ```
@@ -148,16 +155,23 @@ This generated method merges a set of chunks back into a single instance.
     **OR**
 
     ```csharp
-    using Gordo.ChunkyMonkey.Attributes
+    using Gord0.ChunkMonkey.Attributes;
 
     namespace TestProject
     {
         public partial class Person
         {
+            public string? Name { get; set; }
+
+            public DateTime? DateOfBirth { get; set; }
+
             [ChunkMember]
-            public string[] PhoneNumbers { get; set; }
+            public string[]? PhoneNumbers { get; set; }
+
+            [ChunkMember]
+            public List<string>? RecentAddresses { get; set; }
         }
-    }
+    }  
     ```
 
     > :memo: **Note:** If your classes/DTOs live in a separate project, you should add the `Gord0.ChunkyMonkey.Attributes` package to that project. This package provides the `ChunkAttribute` and `ChunkMemberAttribute` types.
@@ -171,12 +185,13 @@ This generated method merges a set of chunks back into a single instance.
 	- Expand the Gord0.ChunkyMonkey.CodeGenerator.ChunkyMonkeyGenerator node.
 	- Now you will see the generated partial classes, each containing the `Chunk` and `MergeChunks` methods. The generated classes are called `<ClassName>_ChunkeyMonkey.g.cs`
 	
-5. The output for the above Person class would be a file called `Person_Chunk.g.cs`:
+5. The output for the above Person class would be a file called `Person_ChunkeyMonkey.g.cs`:
 
     ```csharp
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Collections.Immutable;
     using System.Linq;
 
     namespace TestProject
@@ -190,16 +205,17 @@ This generated method merges a set of chunks back into a single instance.
             /// <returns>An enumerable of chunked instances.</returns>
             public IEnumerable<Person> Chunk(int chunkSize)
             {
-                // Find the length of the biggest collecion.
-                int biggestCollectionLength = 0;
-                if (this.PhoneNumbers.Length > biggestCollectionLength)
-                {
-                    biggestCollectionLength = this.PhoneNumbers.Length;
-                }
+                // Find the length of the biggest collection.
+                long biggestCollectionLength = new long[] {
+                    (this.PhoneNumbers is not null) ? this.PhoneNumbers.Length : 0, 
+                    (this.RecentAddresses is not null) ? this.RecentAddresses.Count : 0
+                }.Max();
 
                 for (int i = 0; i < biggestCollectionLength; i += chunkSize)
                 {
                     var instance = new Person();
+                    instance.Name = this.Name;
+                    instance.DateOfBirth = this.DateOfBirth;
                     {
                         if (this.PhoneNumbers is not null)
                         {
@@ -207,6 +223,10 @@ This generated method merges a set of chunks back into a single instance.
                         }
                     }
 
+                    if (this.RecentAddresses is not null)
+                    {
+                        instance.RecentAddresses = this.RecentAddresses.Skip(i).Take(chunkSize).ToList();
+                    }
 
                     yield return instance;
                 }
@@ -221,19 +241,67 @@ This generated method merges a set of chunks back into a single instance.
             {
                 var instance = new Person();
 
+                long chunkNumber = 0;
+                string? lastValue_Name = default;
+                global::System.DateTime? lastValue_DateOfBirth = default;
+                List<string>? tempArrayList_PhoneNumbers = null;
+
                 foreach(var chunk in chunks)
                 {
+                    if (chunkNumber > 0)
+                    {
+                        if (lastValue_Name != chunk.Name)
+                        {
+                            throw new InvalidDataException("Chunks contain different values for non-chunked property 'Name'");
+                        }
+                        if (lastValue_DateOfBirth != chunk.DateOfBirth)
+                        {
+                            throw new InvalidDataException("Chunks contain different values for non-chunked property 'DateOfBirth'");
+                        }
+                    }
+
+                    instance.Name = chunk.Name;
+                    lastValue_Name = chunk.Name;
+
+                    instance.DateOfBirth = chunk.DateOfBirth;
+                    lastValue_DateOfBirth = chunk.DateOfBirth;
 
                     if (chunk.PhoneNumbers is not null)
                     {
-                        if (instance.PhoneNumbers is null)
+                        if (tempArrayList_PhoneNumbers is null)
                         {
-                            instance.PhoneNumbers = Array.Empty<string>();
+                            tempArrayList_PhoneNumbers = [];
                         }
 
-                        instance.PhoneNumbers = instance.PhoneNumbers.Concat(chunk.PhoneNumbers).ToArray();
+                        tempArrayList_PhoneNumbers.AddRange(chunk.PhoneNumbers);
                     }
 
+                    if (chunk.RecentAddresses is not null)
+                    {
+                        if (instance.RecentAddresses is null)
+                        {
+                            instance.RecentAddresses = new List<string>();
+                        }
+
+                        if (chunk.RecentAddresses is not null)
+                        {
+                            foreach(var value in chunk.RecentAddresses)
+                            {
+                                instance.RecentAddresses.Add(value);
+                            }
+                        }
+                    }
+
+                    chunkNumber++;
+                }
+
+                if (tempArrayList_PhoneNumbers is not null)
+                {
+                    instance.PhoneNumbers = tempArrayList_PhoneNumbers.ToArray();
+                }
+                else
+                {
+                    instance.PhoneNumbers = null;
                 }
 
                 return instance;
@@ -257,3 +325,8 @@ This generated method merges a set of chunks back into a single instance.
 | 1.0.45  | CodeGenerator rewritten to use INamedTypeSymbol and IpropertyRecord.Symbol, rather than ClassDeclaration. Support for nullable types. Improved generic type handling. Updated documentation. |
 | 2.0.3   | Refactored |
 | 2.0.7   | Check that non-chunked values do not change beween chunks to be merged. Improved performance when merging chunks for array collections. |
+| 2.0.8   | Added ChunkMemberAttributeAnalyzer. Fixes for ChunkAttributeAnalyzer. |
+| 2.0.9   | Fixes for ChunkMemberAttributeAnalyzer. |
+| 2.0.10  | Updated description for NonSupportedChunkingTypeWithChunkMemberRule |
+| 2.0.11  | Minor fixes | ChunkMemberAttributeAnalyzer |
+| 2.0.12  | Fixed code analyser rules: NoAccessibleChunkablePropertiesRule, NoChunkablePropertiesRule & NonSupportedChunkingTypeWithChunkMemberRule.<br>Parameterised NonSupportedChunkingTypeWithChunkMemberRule<br>PropertyRecord now has a GenericTypeArguments property<br>PropertyRecord.IsChunkable-> PropertyRecord.HasSupportedTypeForChunking<br>Support for `ImmutableArray<T>` |

@@ -96,12 +96,17 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
 
             var properties = classPropertyEvaluator.GetProperties(classRecord, removeIgnoredProperties: false);
 
-            if (properties.Any(p => p.IsChunkable && !p.AccessibilityRequirementFulfilled))
+
+            var chunkableMembers = properties.Where(p => p.HasSupportedTypeForChunking).Count();
+            var accessibleChunkableMembers = properties.Where(p => p.HasSupportedTypeForChunking && p.AccessibilityRequirementFulfilled).Count();
+            var inaccessibleChunkableMembers = properties.Where(p => p.HasSupportedTypeForChunking && !p.AccessibilityRequirementFulfilled).Count();
+
+            if (chunkableMembers > 0 && accessibleChunkableMembers == 0 && inaccessibleChunkableMembers > 0)
             {
                 var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NoAccessibleChunkablePropertiesRule, classDeclaration.Identifier.GetLocation());
                 context.ReportDiagnostic(diagnostic);
             }
-            else if (!properties.Any(x => x.IsChunkable))
+            else if (chunkableMembers == 0)
             {
                 var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NoChunkablePropertiesRule, classDeclaration.Identifier.GetLocation());
                 context.ReportDiagnostic(diagnostic);

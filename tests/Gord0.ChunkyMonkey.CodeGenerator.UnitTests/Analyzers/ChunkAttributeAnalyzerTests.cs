@@ -3,7 +3,7 @@ using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 
-namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
+namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Analyzers
 {
     /*
      Useful resources:
@@ -63,6 +63,6 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
                     .WithSpan(5, 29, 5, 77));
 
             await test.RunAsync();
-        }        
+        }
     }
 }

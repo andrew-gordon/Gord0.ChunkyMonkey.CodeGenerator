@@ -1,5 +1,6 @@
 ﻿using Gord0.ChunkyMonkey.CodeGenerator.Extensions;
 using Microsoft.CodeAnalysis;
+using System.Collections.Immutable;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 {
@@ -39,6 +40,14 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                     var isChunkableCollectionProperty = typeRule is not null;
                     bool ignoreProperty = false;
                     bool accessibilityRequirementFulfilled = true;
+                    bool isValueType = p.Type.IsValueType;
+                    ImmutableArray<ITypeSymbol> genericTypeArguments = [];
+
+                    var propertyType = p.Type;
+                    if (propertyType is INamedTypeSymbol namedType && namedType.IsGenericType)
+                    {
+                        genericTypeArguments = namedType.TypeArguments;
+                    }
 
                     if (isMemberChunked)
                     {
@@ -59,18 +68,32 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                             attributeMemberAccessorValue = chunkAttribute.ConstructorArguments[0].Value as int?;
                         }
 
-                        if (propertyAccessor != Accessibility.Public && attributeMemberAccessorValue == 0)
+                        Accessibility[] nonPublicAccessibilities = [Accessibility.Private, Accessibility.Protected, Accessibility.ProtectedAndInternal, Accessibility.ProtectedOrInternal];
+                        if (nonPublicAccessibilities.Contains(propertyAccessor) && attributeMemberAccessorValue == 0)
                         {
                             ignoreProperty = true;
                             accessibilityRequirementFulfilled = false;
                         }
                     }
 
-
                     var lastValueVariableName = "lastValue_" + p.Name;
-                    var temporaryListVariableNameForArrays = isArray ? "tempArrayList_" + p.Name : null;
-                    var arrayElementType = isArray ? ((IArrayTypeSymbol)p.Type).ElementType : null;
-                    return new PropertyRecord(p, typeRule, declarationType, isArray, isClassChunked, isMemberChunked, accessibilityRequirementFulfilled, arrayElementType, ignoreProperty, lastValueVariableName, temporaryListVariableNameForArrays);
+                    var temporaryListVariableNameForArray = isArray || p.IsGenericType("System.Collections.Immutable.ImmutableArray<T>") ? "tempArrayList_" + p.Name : null;
+                    var standardArrayElementType = isArray ? ((IArrayTypeSymbol)p.Type).ElementType : null;
+
+                    return new PropertyRecord(
+                        propertySymbol: p,
+                        typeRule: typeRule,
+                        isValueType: isValueType,
+                        declarationType: declarationType,
+                        isArray: isArray, 
+                        isClassChunked: isClassChunked,
+                        isMemberChunked: isMemberChunked, 
+                        accessibilityRequirementFulfilled: accessibilityRequirementFulfilled,
+                        genericTypeArguments: genericTypeArguments, 
+                        standardArrayElementType: standardArrayElementType, 
+                        ignoreProperty: ignoreProperty,
+                        lastValueVariableName: lastValueVariableName,
+                        temporaryListVariableNameForArray: temporaryListVariableNameForArray);
                 })
                 .Where(x => !removeIgnoredProperties || !x.IgnoreProperty)
                 .ToArray();

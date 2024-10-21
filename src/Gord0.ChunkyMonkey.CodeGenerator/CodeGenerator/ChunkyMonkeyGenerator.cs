@@ -33,7 +33,8 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 
                         return new ClassRecord(classSymbol!);
                     })
-                .Where(c => c is not null && c.ClassSymbol is not null && (c.ClassSymbol.GetAttribute(AttributeFullTypeNames.Chunk) is not null ||
+                .Where(c => c is not null && c.ClassSymbol is not null &&
+                            (c.ClassSymbol.GetAttribute(AttributeFullTypeNames.Chunk) is not null ||
                             c.ClassSymbol.IsAttributeAppliedToAnyProperty(AttributeFullTypeNames.ChunkMember)));
 
             // Collect all the filtered classes for further processing
@@ -81,6 +82,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             sb.AppendLine("using System;");
             sb.AppendLine("using System.Collections.Generic;");
             sb.AppendLine("using System.Collections.ObjectModel;");
+            sb.AppendLine("using System.Collections.Immutable;");
             sb.AppendLine("using System.Linq;");
             sb.AppendLine("");
 
@@ -116,10 +118,22 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
                 sb.AppendLine($"            long biggestCollectionLength = new long[] {{");
                 foreach (var property in chunkCollectionProperties)
                 {
-                    sb.AppendLine($"                (this.{property.Symbol.Name} is not null) ? this.{property.Symbol.Name}.{property.TypeRecord!.LengthPropertyName} : 0");
+                    if (property.IsValueType)
+                    {
+                        sb.Append($"                this.{property.Symbol.Name}.{property.TypeRecord!.LengthPropertyName}");
+                    } 
+                    else
+                    {
+                        sb.Append($"                (this.{property.Symbol.Name} is not null) ? this.{property.Symbol.Name}.{property.TypeRecord!.LengthPropertyName} : 0");
+                    }
+
                     if (property != chunkCollectionProperties.Last())
                     {
-                        sb.Append(", ");
+                        sb.AppendLine(", ");
+                    }
+                    else
+                    {
+                        sb.AppendLine("");
                     }
                 }
                 sb.AppendLine($"            }}.Max();");
@@ -136,7 +150,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 
             foreach (var property in classProperties)
             {
-                if (property.IsChunkable)
+                if (property.HasSupportedTypeForChunking)
                 {
                     var line = property.TypeRecord!.ChunkCodeFactory(property);
                     sb.AppendLine(line);
@@ -174,7 +188,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 
             foreach (var property in classProperties)
             {
-                if (property.IsChunkable && property.TypeRecord?.PreMergeChunksCodeFactory is not null)
+                if (property.HasSupportedTypeForChunking && property.TypeRecord?.PreMergeChunksCodeFactory is not null)
                 {
                     var line = property.TypeRecord.PreMergeChunksCodeFactory(property);
                     sb.AppendLine(line);
@@ -201,7 +215,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 
             foreach (var property in classProperties)
             {
-                if (property.IsChunkable)
+                if (property.HasSupportedTypeForChunking)
                 {
                     var line = property.TypeRecord!.MergePopertyValuesFromChunkFactory(property);
                     sb.AppendLine(line);
@@ -221,7 +235,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             var postMergeAdded = false;
             foreach (var property in classProperties)
             {
-                if (property.IsChunkable && property.TypeRecord?.PostMergeChunksCodeFactory is not null)
+                if (property.HasSupportedTypeForChunking && property.TypeRecord?.PostMergeChunksCodeFactory is not null)
                 {
                     var line = property.TypeRecord.PostMergeChunksCodeFactory(property);
                     sb.AppendLine(line);

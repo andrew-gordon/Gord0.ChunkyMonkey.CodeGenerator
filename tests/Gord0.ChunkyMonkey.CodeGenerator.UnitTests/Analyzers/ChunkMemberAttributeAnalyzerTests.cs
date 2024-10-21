@@ -3,7 +3,7 @@ using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 
-namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
+namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Analyzers
 {
     /*
      Useful resources:
@@ -118,8 +118,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
 
             test.ExpectedDiagnostics.Add(
                 new DiagnosticResult(DiagnosticDescriptors.NonSupportedChunkingTypeWithChunkMemberRule.Id, DiagnosticSeverity.Error)
-                    .WithMessage("ChunkMemberAtribute cannot be applied to a member with a type that ChunkyMonkey cannot chunk. See https://github.com/andrew-gordon/Gord0.ChunkyMonkey.CodeGenerator for a list of supported types.")
-                    .WithSpan(4, 23, 4, 32));
+                    .WithMessage("ChunkMemberAtribute cannot be applied to member 'Name' with a type that ChunkyMonkey cannot chunk ('string'). See https://github.com/andrew-gordon/Gord0.ChunkyMonkey.CodeGenerator for a list of supported types.")
+                    .WithSpan(4, 23, 4, 32)
+                    .WithArguments("Name", "string"));
 
             await test.RunAsync();
         }

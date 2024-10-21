@@ -1,24 +1,44 @@
 ﻿using Microsoft.CodeAnalysis;
+using System;
+using System.Collections.Immutable;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 {
     /// <summary>
     /// Represents a record for a property.
     /// </summary>
-    public class PropertyRecord(IPropertySymbol p, TypeRecord? typeRule, string declarationType, bool isArray, bool isClassChunked, bool isMemberChunked, bool accessibilityRequirementFulfilled, ITypeSymbol? arrayElementType, bool ignoreProperty, string lastValueVariableName, string? temporaryListVariableNameForArrays)
+    public class PropertyRecord(
+        IPropertySymbol propertySymbol,
+        TypeRecord? typeRule,
+        bool isValueType,
+        string declarationType,
+        bool isArray,
+        bool isClassChunked,
+        bool isMemberChunked,
+        bool accessibilityRequirementFulfilled,
+        ImmutableArray<ITypeSymbol> genericTypeArguments,
+        ITypeSymbol? standardArrayElementType,
+        bool ignoreProperty,
+        string lastValueVariableName,
+        string? temporaryListVariableNameForArray)
     {
-
         /// <summary>
         /// Gets or sets the symbol of the property.
         /// </summary>
         /// <value>The symbol of the property.</value>
-        public IPropertySymbol Symbol { get; } = p;
+        public IPropertySymbol Symbol { get; } = propertySymbol;
 
         /// <summary>
         /// Gets or sets the type rule for the property.
         /// </summary>
         /// <value>The type rule for the property.</value>
         public TypeRecord? TypeRecord { get; } = typeRule;
+
+        /// <summary>
+        /// Gets a value indicating whether the property is a value type.
+        /// </summary>
+        /// <value><c>true</c> if the property is a value type; otherwise, <c>false</c>.</value>
+        public bool IsValueType { get; } = isValueType;
 
         /// <summary>
         /// Gets or sets the declaration type of the property.
@@ -39,10 +59,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         public string? LastValueVariableName { get; set; } = lastValueVariableName;
 
         /// <summary>
-        /// Gets or sets the temporary variable name for arrays.
+        /// Gets or sets the temporary variable name for the array.
         /// </summary>
-        /// <value>The temporary variable name for arrays.</value>
-        public string? TemporaryListVariableNameForArray { get; set; } = temporaryListVariableNameForArrays;
+        /// <value>The temporary variable name for the array.</value>
+        public string? TemporaryListVariableNameForArray { get; set; } = temporaryListVariableNameForArray;
 
         /// <summary>
         /// Gets a value indicating whether the property is an array.
@@ -66,18 +86,24 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         /// Gets the array element type.
         /// </summary>
         /// <value>The array element type.</value>
-        public ITypeSymbol? ArrayElementType { get; } = arrayElementType;
-
-        /// <summary>
-        /// Gets a value indicating whether the property is chunkable.
-        /// </summary>
-        /// <value><c>true</c> if the property is chunkable; otherwise, <c>false</c>.</value>
-        public bool IsChunkable => TypeRecord != null;
+        public ITypeSymbol? ArrayElementType { get; } = standardArrayElementType;
 
         /// <summary>
         /// Gets a value indicating whether the accessibility requirement is fulfilled.
         /// </summary>
         /// <value><c>true</c> if the accessibility requirement is fulfilled; otherwise, <c>false</c>.</value>
         public bool AccessibilityRequirementFulfilled { get; } = accessibilityRequirementFulfilled;
+
+        /// <summary>
+        /// Gets a value indicating whether the property has a supported type for chunking.
+        /// </summary>
+        /// <value><c>true</c> if the property has a supported type for chunking; otherwise, <c>false</c>.</value>
+        public bool HasSupportedTypeForChunking => TypeRecord != null;
+
+        /// <summary>
+        /// Gets the generic type arguments.
+        /// </summary>
+        /// <value>The generic type arguments.</value>
+        public ImmutableArray<ITypeSymbol> GenericTypeArguments => genericTypeArguments;
     }
 }
