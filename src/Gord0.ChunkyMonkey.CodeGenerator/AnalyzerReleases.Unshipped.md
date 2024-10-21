@@ -1,5 +1,5 @@
-﻿## Release 1.0.39
+﻿### New Rules
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
-	    |          |          |
+

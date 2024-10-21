@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.CSharp;
 using Gord0.ChunkyMonkey.CodeGenerator.Extensions;
 
-namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
+namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 {
     /// <summary>
     /// Represents a record for a class declaration.

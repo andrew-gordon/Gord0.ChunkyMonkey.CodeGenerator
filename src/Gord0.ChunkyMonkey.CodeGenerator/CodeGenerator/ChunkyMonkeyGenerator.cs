@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain;
+using Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
@@ -48,7 +50,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
                     // Generate source code for each class
                     var generatedCode = GenerateChunkingCode(classRecord!);
 
-                    spc.AddSource($"{classRecord.Name}_ChunkGenerated.cs", SourceText.From(generatedCode, Encoding.UTF8));
+                    spc.AddSource($"{classRecord.Name}_ChunkeyMonkey.cs", SourceText.From(generatedCode, Encoding.UTF8));
                 }
             });
         }
@@ -56,12 +58,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
         /// <summary>
         /// Checks if the property symbol represents a generic type with the specified type name.
         /// </summary>
-        /// <param name="propertySymbol">The property symbol to check.</param>
+        /// <param name="symbol">The property symbol to check.</param>
         /// <param name="typeName">The type name to match.</param>
         /// <returns>True if the property symbol represents a generic type with the specified type name, otherwise false.</returns>
-        private bool IsGenericType(IPropertySymbol propertySymbol, string typeName)
+        private bool IsGenericType(IPropertySymbol symbol, string typeName)
         {
-            if (propertySymbol.Type is INamedTypeSymbol namedType && namedType.IsGenericType)
+            if (symbol.Type is INamedTypeSymbol namedType && namedType.IsGenericType)
             {
                 var from = namedType.ConstructedFrom.ToString();
                 return from == typeName;
@@ -85,7 +87,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 
             var typeRules = new List<TypeRecord>();
             var chunkCodeFactory = new ChunkCodeFactory();
-            var MergeChunksCodeFactory = new MergeChunksCodeFactory();
+            var mergeChunksCodeFactory = new MergePopertyValuesFromChunkFactory();
+            var preMergeChunksCodeFactory = new PreMergeChunksCodeFactory();
+            var postMergeChunksCodeFactory = new PostMergeChunksCodeFactory();
 
             typeRules.AddRange(
                 [
@@ -94,48 +98,49 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
                         TypeMatcher: x => IsGenericType(x, "System.Collections.Generic.List<T>"),
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForListProperty,
-                        MergeChunksCodeFactory: MergeChunksCodeFactory.ForListProperty),
+                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForListProperty,
+                        PreMergeChunksCodeFactory: null,
+                        PostMergeChunksCodeFactory: null),
                     new TypeRecord(
                         Name: "Collection",
                         TypeMatcher: x => IsGenericType(x, "System.Collections.ObjectModel.Collection<T>"),
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForCollectionProperty,
-                        MergeChunksCodeFactory: MergeChunksCodeFactory.ForCollectionProperty),
+                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForCollectionProperty,
+                        PreMergeChunksCodeFactory: null,
+                        PostMergeChunksCodeFactory: null),
                     new TypeRecord(
                         Name: "Dictionary",
                         TypeMatcher: x => IsGenericType(x, "System.Collections.Generic.Dictionary<TKey, TValue>"),
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForDictionaryProperty,
-                        MergeChunksCodeFactory: MergeChunksCodeFactory.ForDictionaryProperty),
+                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForDictionaryProperty,
+                        PreMergeChunksCodeFactory: null,
+                        PostMergeChunksCodeFactory: null),
                     new TypeRecord(
                         Name: "Array",
-                        TypeMatcher: propertySymbol => propertySymbol.Type.Kind == SymbolKind.ArrayType && propertySymbol.GetMethod!=null && propertySymbol.SetMethod!=null,
+                        TypeMatcher: x => x.Type.Kind == SymbolKind.ArrayType && x.GetMethod != null && x.SetMethod != null,
                         LengthPropertyName: "Length",
                         ChunkCodeFactory: chunkCodeFactory.ForArrayProperty,
-                        MergeChunksCodeFactory: propertySymbol => MergeChunksCodeFactory.ForArrayProperty(
-                            propertySymbol,
-                            ps => {
-                                var arrayTypeElement = "Unknown";
-
-                                if (ps.Type is IArrayTypeSymbol arrayTypeSymbol) {
-                                    arrayTypeElement = arrayTypeSymbol.ElementType.Name;
-                                }
-
-                                var t = $"Array.Empty<{arrayTypeElement}>()";
-                                return t;
-                            })),
+                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForArrayProperty,
+                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForArrayProperty,
+                        PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForArrayProperty),
                     new TypeRecord(
                         Name: "HashSet",
                         TypeMatcher: x => IsGenericType(x, "System.Collections.Generic.HashSet<T>"),
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForHashSetProperty,
-                        MergeChunksCodeFactory: MergeChunksCodeFactory.ForHashSetProperty),
+                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForHashSetProperty,
+                        PreMergeChunksCodeFactory: null,
+                        PostMergeChunksCodeFactory: null),
                     new TypeRecord(
                         Name: "SortedSet",
                         TypeMatcher: x => IsGenericType(x, "System.Collections.Generic.SortedSet<T>"),
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForSortedSetProperty,
-                        MergeChunksCodeFactory: MergeChunksCodeFactory.ForSortedSetProperty)
+                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForSortedSetProperty,
+                        PreMergeChunksCodeFactory: null,
+                        PostMergeChunksCodeFactory: null),
                 ]
              );
 
@@ -161,29 +166,47 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             sb.AppendLine("        {");
 
             sb.AppendLine($"            // Find the length of the biggest collection.");
-            sb.AppendLine($"            int biggestCollectionLength = 0;");
 
-            var properties = classRecord.Properties
-                .Select(p => new
+            var classProperties = classRecord.Properties
+                .Select(p =>
                 {
-                    PropertySymbol = p,
-                    TypeRule = typeRules.FirstOrDefault(r => r.TypeMatcher(p))
+                    var typeRule = typeRules.FirstOrDefault(r => r.TypeMatcher(p));
+                    var declarationType = p.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier | SymbolDisplayMiscellaneousOptions.UseSpecialTypes));
+                    var isArray = p.Type.Kind == SymbolKind.ArrayType;
+                    var chunkProperty = typeRule is not null
+                            && p.DeclaredAccessibility == Accessibility.Public &&
+                            (classChunkAttribute is not null || GetAttributeForSymbol(AttributeFullTypeNames.ChunkMember, p) is not null);
+                    var lastValueVariableName = "lastValue_" + p.Name;
+                    var temporaryListVariableNameForArrays = isArray ? "tempArrayList_" + p.Name : null;
+                    var arrayElementType = isArray ? ((IArrayTypeSymbol)p.Type).ElementType : null;
+                    return new PropertyRecord(p, typeRule, declarationType, isArray, arrayElementType, chunkProperty, lastValueVariableName, temporaryListVariableNameForArrays);
                 })
                 .ToArray();
 
-            var propertySymbolWithRules = properties
-                .Where(x => x.TypeRule is not null)
+            var chunkCollectionProperties = classProperties
+                .Where(x => x.ChunkProperty)
                 .ToImmutableArray();
 
-            foreach (var propertySymbolWithRule in propertySymbolWithRules)
-            {
-                var p = propertySymbolWithRule.PropertySymbol;
-                var r = propertySymbolWithRule.TypeRule;
+            var nonChunkedProperties = classProperties
+                .Where(x => !x.ChunkProperty)
+                .ToImmutableArray();
 
-                sb.AppendLine($"            if (this.{p.Name}.{r.LengthPropertyName} > biggestCollectionLength)");
-                sb.AppendLine($"            {{");
-                sb.AppendLine($"                biggestCollectionLength = this.{p.Name}.{r.LengthPropertyName};");
-                sb.AppendLine($"            }}");
+            if (chunkCollectionProperties.Any())
+            {
+                sb.AppendLine($"            long biggestCollectionLength = new long[] {{");
+                foreach (var property in chunkCollectionProperties)
+                {
+                    sb.AppendLine($"                (this.{property.Symbol.Name} is not null) ? this.{property.Symbol.Name}.{property.TypeRule!.LengthPropertyName} : 0");
+                    if (property != chunkCollectionProperties.Last())
+                    {
+                        sb.Append(", ");
+                    }
+                }
+                sb.AppendLine($"            }}.Max();");
+            }
+            else
+            {
+                sb.AppendLine($"            long biggestCollectionLength = 0;");
             }
 
             sb.AppendLine($"");
@@ -191,23 +214,16 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             sb.AppendLine($"            {{");
             sb.AppendLine($"                var instance = new {className}();");
 
-            foreach (var propertySymbolWithRule in properties)
+            foreach (var property in classProperties)
             {
-                var p = propertySymbolWithRule.PropertySymbol;
-                var r = propertySymbolWithRule.TypeRule;
-
-                var chunkMemberAttribute = GetAttributeForSymbol(AttributeFullTypeNames.ChunkMember, p);
-                var propertyIsPublic = p.DeclaredAccessibility == Accessibility.Public;
-                var memberToBeChunked = propertyIsPublic && (chunkMemberAttribute is not null || classChunkAttribute is not null);
-
-                if (memberToBeChunked && r is not null)
+                if (property.ChunkProperty)
                 {
-                    var line = r.ChunkCodeFactory(p);
+                    var line = property.TypeRule!.ChunkCodeFactory(property);
                     sb.AppendLine(line);
                 }
                 else
                 {
-                    sb.AppendLine($"                instance.{p.Name} = this.{p.Name};");
+                    sb.AppendLine($"                instance.{property.Symbol.Name} = this.{property.Symbol.Name};");
                 }
             }
 
@@ -225,30 +241,79 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             sb.AppendLine($"        {{");
             sb.AppendLine($"            var instance = new {className}();");
             sb.AppendLine("");
+            sb.AppendLine($"            long chunkNumber = 0;");
+
+
+            foreach (var property in nonChunkedProperties)
+            {
+                bool isNullable = property.Symbol.Type.NullableAnnotation == NullableAnnotation.Annotated;
+                var nullableSuffix = isNullable ? string.Empty : "?"; // make non-nullable types nullable for the last value variables
+
+                sb.AppendLine($"            {property.DeclarationType}{nullableSuffix} {property.LastValueVariableName} = default;");
+            }
+
+            foreach (var property in classProperties)
+            {
+                if (property.ChunkProperty && property.TypeRule?.PreMergeChunksCodeFactory is not null)
+                {
+                    var line = property.TypeRule.PreMergeChunksCodeFactory(property);
+                    sb.AppendLine(line);
+                }
+            }
+
+            sb.AppendLine("");
             sb.AppendLine($"            foreach(var chunk in chunks)");
             sb.AppendLine($"            {{");
 
-            foreach (var propertySymbolWithRule in properties)
+
+            sb.AppendLine($"                if (chunkNumber > 0)");
+            sb.AppendLine($"                {{");
+
+            foreach (var property in nonChunkedProperties)
             {
-                var p = propertySymbolWithRule.PropertySymbol;
-                var r = propertySymbolWithRule.TypeRule;
+                sb.AppendLine($"                    if ({property.LastValueVariableName} != chunk.{property.Symbol.Name})");
+                sb.AppendLine($"                    {{");
+                sb.AppendLine($"                        throw new InvalidDataException(\"Chunks contain different values for non-chunked property '{property.Symbol.Name}'\");");
+                sb.AppendLine($"                    }}");
+            }
+            sb.AppendLine($"                }}");
+            sb.AppendLine("");
 
-                var chunkMemberAttribute = GetAttributeForSymbol(AttributeFullTypeNames.ChunkMember, p);
-
-                var memberToBeChecked = chunkMemberAttribute is not null || classChunkAttribute is not null;
-                if (memberToBeChecked && r is not null)
+            foreach (var property in classProperties)
+            {
+                if (property.ChunkProperty)
                 {
-                    var line = r.MergeChunksCodeFactory(p);
+                    var line = property.TypeRule!.MergePopertyValuesFromChunkFactory(property);
                     sb.AppendLine(line);
                 }
                 else
                 {
-                    sb.AppendLine($"                  instance.{p.Name} = chunk.{p.Name};");
+                    sb.AppendLine($"                instance.{property.Symbol.Name} = chunk.{property.Symbol.Name};");
+                    sb.AppendLine($"                {property.LastValueVariableName} = chunk.{property.Symbol.Name};");
+                    sb.AppendLine("");
                 }
             }
 
+            sb.AppendLine($"                chunkNumber++;");
             sb.AppendLine($"            }}");
             sb.AppendLine("");
+
+            var postMergeAdded = false;
+            foreach (var property in classProperties)
+            {
+                if (property.ChunkProperty && property.TypeRule?.PostMergeChunksCodeFactory is not null)
+                {
+                    var line = property.TypeRule.PostMergeChunksCodeFactory(property);
+                    sb.AppendLine(line);
+                    postMergeAdded = true;
+                }
+            }
+
+            if (postMergeAdded)
+            {
+                sb.AppendLine("");
+            }
+
             sb.AppendLine($"            return instance;");
             sb.AppendLine($"        }}");
             sb.AppendLine("   }");
@@ -267,13 +332,13 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
         /// <returns>True if the attribute is applied to any property, otherwise false.</returns>
         private bool IsAttributeAppliedToAnyProperty(string attributeFullTypeName, INamedTypeSymbol classSymbol)
         {
-            var propertySymbols = classSymbol
+            var symbols = classSymbol
                 .GetMembers()
                 .OfType<IPropertySymbol>();
 
-            foreach (var propertySymbol in propertySymbols)
+            foreach (var symbol in symbols)
             {
-                var hasChunkMemberAttribute = GetAttributeForSymbol(attributeFullTypeName, propertySymbol) is not null;
+                var hasChunkMemberAttribute = GetAttributeForSymbol(attributeFullTypeName, symbol) is not null;
                 if (hasChunkMemberAttribute)
                 {
                     return true;

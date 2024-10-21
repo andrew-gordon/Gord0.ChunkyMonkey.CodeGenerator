@@ -35,8 +35,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+		<AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
+	</ItemGroup>
+	
+	<ItemGroup>
 		<None Include="..\..\README.md" Pack="true" PackagePath="/" />
-		<None Include="$(OutputPath)\Gord0.ChunkyMonkey.CodeGenerator.dll"  Pack="true" PackagePath="analyzers/dotnet/cs" />
+		<None Include="$(OutputPath)\Gord0.ChunkyMonkey.CodeGenerator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
 		<None Include="..\..\media\icon.png" Pack="true" PackagePath="/" />
 	</ItemGroup>
 </Project>

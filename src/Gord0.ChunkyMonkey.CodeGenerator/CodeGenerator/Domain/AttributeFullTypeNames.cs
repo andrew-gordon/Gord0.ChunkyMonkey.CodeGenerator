@@ -1,4 +1,4 @@
-﻿namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
+﻿namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 {
     internal static class AttributeFullTypeNames
     {

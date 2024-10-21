@@ -1,5 +1,5 @@
 ﻿using System.Collections.Immutable;
-using Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator;
+using Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,7 +11,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
     public class ChunkAttributeAnalyzer : DiagnosticAnalyzer
     {
         private static readonly DiagnosticDescriptor NonAbstractClassRule = new(
-            "CMKY001",
+            "CMKY0001",
             "Invalid use of ChunkAttribute on an abstract class",
             "ChunkAttribute cannot be applied to an abstract class",
             "Usage",
@@ -19,7 +19,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             isEnabledByDefault: true);
 
         private static readonly DiagnosticDescriptor NonStaticClassRule = new(
-            "CMKY002",
+            "CMKY0002",
             "Invalid use of ChunkAttribute on a static class",
             "ChunkAttribute cannot be applied to a static class",
             "Usage",
@@ -27,7 +27,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             isEnabledByDefault: true);
 
         private static readonly DiagnosticDescriptor ClassWithParameterlessContructorRule = new(
-            "CMKY003",
+            "CMKY0003",
             "Invalid use of ChunkAttribute on class without parameterless constructor",
             "ChunkAttribute can only be applied to a class with a parameterless constructor",
             "Usage",

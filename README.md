@@ -167,9 +167,9 @@ This generated method merges a set of chunks back into a single instance.
 4. To view the generated partial classes:
 	- Expand the Dependencies nodes under your project in the Solution Explorer. 
 	- Expand the Analyzers node.
-	- Expand the ChunkyMonkey.CodeGenerator node.
-	- Expand the ChunkyMonkey.CodeGenerator.ChunkyMonkeyGenerator node.
-	- Now you will see the generated partial classes, each containing the `Chunk` and `MergeChunks` methods. The generated classes are called `<ClassName>_Chunk.g.cs`
+	- Expand the Gord0.ChunkyMonkey.CodeGenerator node.
+	- Expand the Gord0.ChunkyMonkey.CodeGenerator.ChunkyMonkeyGenerator node.
+	- Now you will see the generated partial classes, each containing the `Chunk` and `MergeChunks` methods. The generated classes are called `<ClassName>_ChunkeyMonkey.g.cs`
 	
 5. The output for the above Person class would be a file called `Person_Chunk.g.cs`:
 
@@ -255,5 +255,5 @@ This generated method merges a set of chunks back into a single instance.
 | 1.0.33  | Minor fixes and documentation updates |
 | ...  | ... |
 | 1.0.38  | Minor fixes and documentation updates |
-| 1.0.45  | CodeGenerator rewritten to use INamedTypeSymbol and IPropertySymbol, rather than ClassDeclaration. Support for nullable types. Improved generic type handling. Updated documentation. |
+| 1.0.45  | CodeGenerator rewritten to use INamedTypeSymbol and IpropertyRecord.Symbol, rather than ClassDeclaration. Support for nullable types. Improved generic type handling. Updated documentation. |
 | 2.0.3   | Refactored |
