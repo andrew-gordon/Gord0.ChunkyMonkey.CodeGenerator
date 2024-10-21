@@ -257,3 +257,4 @@ This generated method merges a set of chunks back into a single instance.
 | 1.0.38  | Minor fixes and documentation updates |
 | 1.0.45  | CodeGenerator rewritten to use INamedTypeSymbol and IpropertyRecord.Symbol, rather than ClassDeclaration. Support for nullable types. Improved generic type handling. Updated documentation. |
 | 2.0.3   | Refactored |
+| 2.0.7 | Check that non-chunked values do not change beween chunks to be merged. Improved performance when merging chunks for array collections |
