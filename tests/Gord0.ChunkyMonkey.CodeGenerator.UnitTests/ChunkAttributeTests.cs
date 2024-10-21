@@ -1,5 +1,4 @@
 ﻿using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Helpers;
-using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.TestClasses;
 using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.TestClasses.WithChunkAttributeOnClass;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests

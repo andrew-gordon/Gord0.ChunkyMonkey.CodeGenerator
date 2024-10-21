@@ -11,7 +11,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ChunkMemberAttributeAnalyzer : DiagnosticAnalyzer
-    {      
+    {
         private readonly ClassPropertyEvaluator classPropertyEvaluator;
 
         public ChunkMemberAttributeAnalyzer()
@@ -19,6 +19,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             this.classPropertyEvaluator = new ClassPropertyEvaluator();
         }
 
+        /// <summary>
+        /// Gets the supported diagnostics for the analyzer.
+        /// </summary>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
             DiagnosticDescriptors.InvalidUseOfChunkAttributesRule,
             DiagnosticDescriptors.NonAbstractMemberRule,
@@ -26,6 +29,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             DiagnosticDescriptors.NonSupportedChunkingTypeWithChunkMemberRule
             ];
 
+        /// <summary>
+        /// Initializes the analyzer.
+        /// </summary>
+        /// <param name="context">The analysis context.</param>
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
@@ -34,6 +41,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             context.RegisterSyntaxNodeAction(AnalyzeClass, SyntaxKind.ClassDeclaration);
         }
 
+        /// <summary>
+        /// Analyzes a class declaration.
+        /// </summary>
+        /// <param name="context">The syntax node analysis context.</param>
         private void AnalyzeClass(SyntaxNodeAnalysisContext context)
         {
             var classDeclaration = (ClassDeclarationSyntax)context.Node;

@@ -1,20 +1,29 @@
 ﻿using Gord0.ChunkyMonkey.CodeGenerator.Extensions;
 using Microsoft.CodeAnalysis;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 {
+    /// <summary>
+    /// Evaluates the properties of a class.
+    /// </summary>
     internal class ClassPropertyEvaluator
     {
         private readonly ChunkableTypesRegistry chunkableTypesRegistry;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClassPropertyEvaluator"/> class.
+        /// </summary>
         public ClassPropertyEvaluator()
         {
             chunkableTypesRegistry = new ChunkableTypesRegistry();
         }
 
+        /// <summary>
+        /// Gets the properties of a class.
+        /// </summary>
+        /// <param name="classRecord">The class record.</param>
+        /// <param name="removeIgnoredProperties">A flag indicating whether to remove ignored properties.</param>
+        /// <returns>The properties of the class.</returns>
         public IEnumerable<PropertyRecord> GetProperties(ClassRecord classRecord, bool removeIgnoredProperties = true)
         {
             var classProperties = classRecord.Properties
@@ -29,7 +38,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                     var isMemberChunked = chunkMemberAttribute is not null;
                     var isChunkableCollectionProperty = typeRule is not null;
                     bool ignoreProperty = false;
-
+                    bool accessibilityRequirementFulfilled = true;
 
                     if (isMemberChunked)
                     {
@@ -53,15 +62,16 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         if (propertyAccessor != Accessibility.Public && attributeMemberAccessorValue == 0)
                         {
                             ignoreProperty = true;
+                            accessibilityRequirementFulfilled = false;
                         }
                     }
-                    
+
 
                     var lastValueVariableName = "lastValue_" + p.Name;
                     var temporaryListVariableNameForArrays = isArray ? "tempArrayList_" + p.Name : null;
                     var arrayElementType = isArray ? ((IArrayTypeSymbol)p.Type).ElementType : null;
-                    return new PropertyRecord(p, typeRule, declarationType, isArray, isClassChunked, isMemberChunked, arrayElementType, ignoreProperty, lastValueVariableName, temporaryListVariableNameForArrays);
-                })         
+                    return new PropertyRecord(p, typeRule, declarationType, isArray, isClassChunked, isMemberChunked, accessibilityRequirementFulfilled, arrayElementType, ignoreProperty, lastValueVariableName, temporaryListVariableNameForArrays);
+                })
                 .Where(x => !removeIgnoredProperties || !x.IgnoreProperty)
                 .ToArray();
 

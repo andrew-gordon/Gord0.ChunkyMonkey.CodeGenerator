@@ -1,14 +1,12 @@
-﻿using Gord0.ChunkMonkey.Attributes;
-using Gord0.ChunkyMonkey.CodeGenerator.Analyser;
+﻿using Gord0.ChunkyMonkey.CodeGenerator.Analyser;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
 {
-
     /*
-     See https://www.meziantou.net/how-to-test-a-roslyn-analyzer.htm
+     Useful resources:
+     - https://www.meziantou.net/how-to-test-a-roslyn-analyzer.htm
     */
 
     public class ChunkMemberAttributeAnalyzerTests
@@ -30,16 +28,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
                 }
                 """;
 
-            var test = new CSharpAnalyzerTest<ChunkMemberAttributeAnalyzer, DefaultVerifier>
-            {
-                CompilerDiagnostics = CompilerDiagnostics.All
-            };        
-
-            test.TestState.Sources.Add(testCode);   
-            test.TestState.AdditionalReferences.Add(typeof(ChunkMemberAttribute).Assembly);
-            test.TestState.ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
-            test.DisabledDiagnostics.Add("CS1591"); // xml comments
-            test.DisabledDiagnostics.Add("CS8618"); // Non-nullable property is uninitialized.
+            var test = AnalyzerTestHelper.CreateAnalyzerTest<ChunkMemberAttributeAnalyzer>(testCode);
 
             test.ExpectedDiagnostics.Add(
                 new DiagnosticResult(DiagnosticDescriptors.NonStaticMemberRule.Id, DiagnosticSeverity.Error)
@@ -66,15 +55,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
                 }
                 """;
 
-            var test = new CSharpAnalyzerTest<ChunkMemberAttributeAnalyzer, DefaultVerifier>
-            {
-                CompilerDiagnostics = CompilerDiagnostics.All
-            };
-
-            test.TestState.Sources.Add(testCode);
-            test.TestState.AdditionalReferences.Add(typeof(ChunkMemberAttribute).Assembly);
-            test.TestState.ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
-            test.DisabledDiagnostics.Add("CS1591"); // xml comments
+            var test = AnalyzerTestHelper.CreateAnalyzerTest<ChunkMemberAttributeAnalyzer>(testCode);
 
             test.ExpectedDiagnostics.Add(
                 new DiagnosticResult(DiagnosticDescriptors.NonAbstractMemberRule.Id, DiagnosticSeverity.Error)
@@ -102,16 +83,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
                 }
                 """;
 
-            var test = new CSharpAnalyzerTest<ChunkMemberAttributeAnalyzer, DefaultVerifier>
-            {
-                CompilerDiagnostics = CompilerDiagnostics.All
-            };
-
-            test.TestState.Sources.Add(testCode);
-            test.TestState.AdditionalReferences.Add(typeof(ChunkMemberAttribute).Assembly);
-            test.TestState.ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
-            test.DisabledDiagnostics.Add("CS1591"); // xml comments
-            test.DisabledDiagnostics.Add("CS8618"); // Non-nullable property is uninitialized.
+            var test = AnalyzerTestHelper.CreateAnalyzerTest<ChunkMemberAttributeAnalyzer>(testCode);
 
             test.ExpectedDiagnostics.Add(
                 new DiagnosticResult(DiagnosticDescriptors.NonStaticMemberRule.Id, DiagnosticSeverity.Error)
@@ -141,20 +113,11 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
                 }
                 """;
 
-            var test = new CSharpAnalyzerTest<ChunkMemberAttributeAnalyzer, DefaultVerifier>
-            {
-                CompilerDiagnostics = CompilerDiagnostics.All
-            };
-
-            test.TestState.Sources.Add(testCode);
-            test.TestState.AdditionalReferences.Add(typeof(ChunkMemberAttribute).Assembly);
-            test.TestState.ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
-            test.DisabledDiagnostics.Add("CS1591"); // xml comments
-            test.DisabledDiagnostics.Add("CS8618"); // Non-nullable property is uninitialized.
+            var test = AnalyzerTestHelper.CreateAnalyzerTest<ChunkMemberAttributeAnalyzer>(testCode);
 
             test.ExpectedDiagnostics.Add(
                 new DiagnosticResult(DiagnosticDescriptors.NonSupportedChunkingTypeWithChunkMemberRule.Id, DiagnosticSeverity.Error)
-                    .WithMessage("ChunkMemberAtribute cannot be applied to a member with a type that ChunkyMonkey cannot chunk")
+                    .WithMessage("ChunkMemberAtribute cannot be applied to a member with a type that ChunkyMonkey cannot chunk. See https://github.com/andrew-gordon/Gord0.ChunkyMonkey.CodeGenerator for a list of supported types.")
                     .WithSpan(4, 23, 4, 32));
 
             await test.RunAsync();

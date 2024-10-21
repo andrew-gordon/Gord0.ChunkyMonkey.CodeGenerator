@@ -5,6 +5,11 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
 {
     internal class PostMergeChunksCodeFactory
     {
+        /// <summary>
+        /// Generates the code for assigning values to an array property.
+        /// </summary>
+        /// <param name="propertyRecord">The property record containing the information about the array property.</param>
+        /// <returns>The generated code as a string.</returns>
         internal string ForArrayProperty(PropertyRecord propertyRecord)
         {
             var sb = new StringBuilder();

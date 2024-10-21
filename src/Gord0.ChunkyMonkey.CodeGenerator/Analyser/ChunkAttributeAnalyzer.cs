@@ -9,9 +9,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
 {
 
+    /// <summary>
+    /// Analyzes classes with the ChunkAttribute and reports diagnostics based on specific rules.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ChunkAttributeAnalyzer : DiagnosticAnalyzer
-    {      
+    {
         private readonly ClassPropertyEvaluator classPropertyEvaluator;
 
         public ChunkAttributeAnalyzer()
@@ -19,12 +22,21 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             this.classPropertyEvaluator = new ClassPropertyEvaluator();
         }
 
+        /// <summary>
+        /// Gets the supported diagnostics for the ChunkAttributeAnalyzer.
+        /// </summary>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
-            DiagnosticDescriptors.NonAbstractClassRule, 
-            DiagnosticDescriptors.NonStaticClassRule, 
-            DiagnosticDescriptors.ClassWithParameterlessContructorRule, 
-            DiagnosticDescriptors.NoChunkablePropertiesRule];
+            DiagnosticDescriptors.NonAbstractClassRule,
+                DiagnosticDescriptors.NonStaticClassRule,
+                DiagnosticDescriptors.ClassWithParameterlessContructorRule,
+                DiagnosticDescriptors.NoChunkablePropertiesRule,
+                DiagnosticDescriptors.NoAccessibleChunkablePropertiesRule
+            ];
 
+        /// <summary>
+        /// Initializes the ChunkAttributeAnalyzer.
+        /// </summary>
+        /// <param name="context">The analysis context.</param>
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
@@ -33,6 +45,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             context.RegisterSyntaxNodeAction(AnalyzeClass, SyntaxKind.ClassDeclaration);
         }
 
+        /// <summary>
+        /// Analyzes a class declaration and reports diagnostics based on specific rules.
+        /// </summary>
+        /// <param name="context">The syntax node analysis context.</param>
         private void AnalyzeClass(SyntaxNodeAnalysisContext context)
         {
             var classDeclaration = (ClassDeclarationSyntax)context.Node;
@@ -78,9 +94,14 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
 
             var classRecord = new ClassRecord(classSymbol);
 
-            var properties = classPropertyEvaluator.GetProperties(classRecord);
+            var properties = classPropertyEvaluator.GetProperties(classRecord, removeIgnoredProperties: false);
 
-            if (!properties.Any(x => x.IsChunkable))
+            if (properties.Any(p => p.IsChunkable && !p.AccessibilityRequirementFulfilled))
+            {
+                var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NoAccessibleChunkablePropertiesRule, classDeclaration.Identifier.GetLocation());
+                context.ReportDiagnostic(diagnostic);
+            }
+            else if (!properties.Any(x => x.IsChunkable))
             {
                 var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NoChunkablePropertiesRule, classDeclaration.Identifier.GetLocation());
                 context.ReportDiagnostic(diagnostic);

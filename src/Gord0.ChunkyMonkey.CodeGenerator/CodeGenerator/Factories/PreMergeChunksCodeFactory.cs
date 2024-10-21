@@ -6,6 +6,11 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
 {
     internal class PreMergeChunksCodeFactory
     {
+        /// <summary>
+        /// Generates code to finalise array property merging.
+        /// </summary>
+        /// <param name="propertyRecord">The property record.</param>
+        /// <returns>The generated code.</returns>
         internal string ForArrayProperty(PropertyRecord propertyRecord)
         {
             var sb = new StringBuilder();

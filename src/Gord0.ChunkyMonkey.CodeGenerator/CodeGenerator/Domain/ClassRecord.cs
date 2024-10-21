@@ -1,7 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.CSharp;
-using Gord0.ChunkyMonkey.CodeGenerator.Extensions;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 {
@@ -49,7 +46,6 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         /// Gets a value indicating whether the class is sealed.
         /// </summary>
         public bool IsSealed => ClassSymbol.TypeKind == TypeKind.Class && ClassSymbol.IsSealed;
-
 
         /// <summary>
         /// Gets the property symbols of the class.

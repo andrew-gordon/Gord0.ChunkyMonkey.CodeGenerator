@@ -1,11 +1,9 @@
 ﻿using Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain;
-using Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories;
 using Gord0.ChunkyMonkey.CodeGenerator.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using System;
 using System.Collections.Immutable;
 using System.Text;
 
