@@ -67,6 +67,15 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForArrayProperty),
 
                     new TypeRecord(
+                        Name: "ReadOnlyCollection",
+                        TypeMatcher: x => x.IsGenericType("System.Collections.ObjectModel.ReadOnlyCollection<T>") && x.GetMethod != null && x.SetMethod != null,
+                        LengthPropertyName: "Count",
+                        ChunkCodeFactory: chunkCodeFactory.ForReadOnlyCollectionProperty,
+                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForReadOnlyCollectionProperty,
+                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForReadOnlyCollectionProperty,
+                        PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForReadOnlyCollectionyProperty),
+
+                    new TypeRecord(
                         Name: "ImmutableArray",
                         TypeMatcher: x => x.IsGenericType("System.Collections.Immutable.ImmutableArray<T>") && x.GetMethod != null && x.SetMethod != null,
                         LengthPropertyName: "Length",

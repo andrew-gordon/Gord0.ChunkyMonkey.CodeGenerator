@@ -14,6 +14,7 @@ ChunkyMonkey is a C# code generator that generates code, at build time, to split
 - `System.Collections.Generic.SortedSet<T>` 
 - `System.Collections.Immutable.ImmutableArray<T>`
 - `System.Collections.ObjectModel.Collection<T>`
+- `System.Collections.ObjectModel.ReadOnlyCollection<T>`
 
 ## Use Case
 
@@ -330,3 +331,4 @@ This generated method merges a set of chunks back into a single instance.
 | 2.0.10  | Updated description for NonSupportedChunkingTypeWithChunkMemberRule |
 | 2.0.11  | Minor fixes | ChunkMemberAttributeAnalyzer |
 | 2.0.12  | Fixed code analyser rules: NoAccessibleChunkablePropertiesRule, NoChunkablePropertiesRule & NonSupportedChunkingTypeWithChunkMemberRule.<br>Parameterised NonSupportedChunkingTypeWithChunkMemberRule<br>PropertyRecord now has a GenericTypeArguments property<br>PropertyRecord.IsChunkable-> PropertyRecord.HasSupportedTypeForChunking<br>Support for `ImmutableArray<T>` |
+| 2.0.13  | Added support for `System.Collections.ObjectModel.ReadOnlyCollection<T>` |

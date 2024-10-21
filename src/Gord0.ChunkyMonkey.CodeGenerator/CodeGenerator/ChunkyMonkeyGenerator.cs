@@ -81,8 +81,8 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 
             sb.AppendLine("using System;");
             sb.AppendLine("using System.Collections.Generic;");
-            sb.AppendLine("using System.Collections.ObjectModel;");
             sb.AppendLine("using System.Collections.Immutable;");
+            sb.AppendLine("using System.Collections.ObjectModel;");
             sb.AppendLine("using System.Linq;");
             sb.AppendLine("");
 

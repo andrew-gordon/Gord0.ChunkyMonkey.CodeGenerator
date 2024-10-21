@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain;
+using Microsoft.CodeAnalysis;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
 {
@@ -33,6 +34,14 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
         {
             var sb = new StringBuilder();
             sb.AppendLine($"            instance.{propertyRecord.Symbol.Name} = ({propertyRecord.TemporaryListVariableNameForArray} ?? []).ToImmutableArray();");
+            return sb.ToString();
+        }
+
+        internal string ForReadOnlyCollectionyProperty(PropertyRecord propertyRecord)
+        {
+            var genericType = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var sb = new StringBuilder();
+            sb.AppendLine($"            instance.{propertyRecord.Symbol.Name} = new ReadOnlyCollection<{genericType}>({propertyRecord.TemporaryListVariableNameForArray} ?? []);");
             return sb.ToString();
         }
     }

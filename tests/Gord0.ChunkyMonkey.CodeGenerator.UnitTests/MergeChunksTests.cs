@@ -153,6 +153,50 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
         }
 
         [Fact]
+        public void MergeChunks_ReadOnlyCollectionProperty_ReturnsChunkedInstances()
+        {
+            // Arrange
+            var chunks = new List<Chunk_ClassWithReadOnlyCollectionProperty>
+            {
+                new() {
+                    Name = "John",
+                    Age = 25,
+                    Numbers = new System.Collections.ObjectModel.ReadOnlyCollection<int>([1, 2, 3])
+                },
+                new() {
+                    Name = "John",
+                    Age = 25,
+                    Numbers = new System.Collections.ObjectModel.ReadOnlyCollection<int>([4, 5, 6])
+                },
+                new() {
+                    Name = "John",
+                    Age = 25,
+                    Numbers = new System.Collections.ObjectModel.ReadOnlyCollection<int>([7, 8, 9])
+                },
+                new() {
+                    Name = "John",
+                    Age = 25,
+                    Numbers = new System.Collections.ObjectModel.ReadOnlyCollection<int>([10])
+                },
+            };
+
+            // Act
+            var actual = Chunk_ClassWithReadOnlyCollectionProperty.MergeChunks(chunks);
+
+            var expected = new Chunk_ClassWithReadOnlyCollectionProperty
+            {
+                Name = "John",
+                Age = 25,
+                Numbers = new System.Collections.ObjectModel.ReadOnlyCollection<int>([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+            };
+
+            // Assert
+            Assert.Equal(expected.Name, actual.Name);
+            Assert.Equal(expected.Age, actual.Age);
+            Assert.True(expected.Numbers.SequenceEqual(actual.Numbers));
+        }
+
+        [Fact]
         public void MergeChunks_MulitpleCollectionProperties_ReturnsChunkedInstances()
         {
             // Arrange

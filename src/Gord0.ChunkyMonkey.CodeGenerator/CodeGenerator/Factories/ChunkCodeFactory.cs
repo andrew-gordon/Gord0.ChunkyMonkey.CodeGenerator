@@ -149,5 +149,18 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
                 throw new NotSupportedException("ChunkyMonkey does not support this collection: " + propertyRecord.Symbol);
             }
         }
+
+        internal string ForReadOnlyCollectionProperty(PropertyRecord propertyRecord)
+        {
+            var genericType = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var sb = new StringBuilder();
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    if (this.{propertyRecord.Symbol.Name} is not null)");
+            sb.AppendLine($"                    {{");
+            sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = new ReadOnlyCollection<{genericType}>(this.{propertyRecord.Symbol.Name}.Skip(i).Take(chunkSize).ToList());");
+            sb.AppendLine($"                    }}");
+            sb.AppendLine($"                }}");
+            return sb.ToString();
+        }
     }
 }
