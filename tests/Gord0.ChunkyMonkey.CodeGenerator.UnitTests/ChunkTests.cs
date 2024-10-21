@@ -580,5 +580,70 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
             Assert.Equal(expected3, result[2].Numbers);
             Assert.Equal(expected4, result[3].Numbers);
         }
+
+        [Fact]
+        public void ChunkSorteDictionaryProperty_ReturnsChunkedInstances()
+        {
+            var sortedDictionary = new SortedDictionary<string, int>
+            {
+                { "One", 1 },
+                { "Two", 2 },
+                { "Three", 3 },
+                { "Four", 4 },
+                { "Five", 5 },
+                { "Six", 6 },
+                { "Seven", 7 },
+                { "Eight", 8 },
+                { "Nine", 9 },
+                { "Ten", 10 }
+            };
+
+            // Arrange
+            var instance = new Chunk_ClassWithSortedDictionaryProperty
+            {
+                Numbers = sortedDictionary
+            };
+
+            int chunkSize = 3;
+
+            // Act
+            var result = instance.Chunk(chunkSize).ToList();
+
+            // Assert
+            Assert.Equal(4, result.Count);
+
+            // NB: The keys are sorted so will appear in alphabetical order
+
+            var expected1 = new SortedDictionary<string, int>
+            {
+                { "Eight", 8 },
+                { "Five", 5 },
+                { "Four", 4 },
+            };
+
+            var expected2 = new SortedDictionary<string, int>
+            {
+                { "Nine", 9 },
+                { "One", 1 },
+                { "Seven", 7 },
+            };
+
+            var expected3 = new SortedDictionary<string, int>
+            {
+                { "Six", 6 },
+                { "Ten", 10 },
+                { "Three", 3 }
+            };
+
+            var expected4 = new SortedDictionary<string, int>
+            {
+                { "Two", 2 }
+            };
+
+            Assert.Equal(expected1, result[0].Numbers);
+            Assert.Equal(expected2, result[1].Numbers);
+            Assert.Equal(expected3, result[2].Numbers);
+            Assert.Equal(expected4, result[3].Numbers);
+        }
     }
 }

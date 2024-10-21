@@ -11,6 +11,7 @@ ChunkyMonkey is a C# code generator that generates code, at build time, to split
 - `System.Collections.Generic.Dictionary<K,V>` 
 - `System.Collections.Generic.List<T>`
 - `System.Collections.Generic.HashSet<T>`
+- `System.Collections.Generic.SortedDictionary<TKey, TValue>`
 - `System.Collections.Generic.SortedList<TKey, TValue>`
 - `System.Collections.Generic.SortedSet<T>` 
 - `System.Collections.Immutable.ImmutableArray<T>`
@@ -318,7 +319,6 @@ This generated method merges a set of chunks back into a single instance.
 
 ## Future Enhancements
 
-- Support `System.Collections.Generic.SortedDictionary<TKey, TValue>`
 - Support `System.Collections.Generic.Stack<T>`
 - Support `System.Collections.Generic.Queue<T>`
 - Support `System.Collections.Generic.PriorityQueue<T>`
@@ -355,3 +355,5 @@ This generated method merges a set of chunks back into a single instance.
 | 2.0.14  | Added support for `System.ArraySegment<T>` |
 | 2.0.15  | Added support for `System.Collections.Immutable.ImmutableList` & `System.Collections.Specialized.StringCollection` |
 | 2.0.16  | Added support for `System.Collections.Generic.SortedList<TKey, TValue>` |
+| 2.0.17  | Updated README to reflect addition of support for `System.Collections.Generic.SortedSet<T>` |
+| 2.0.18  | Added support for `System.Collections.Generic.SortedDictionary<TKey, TValue>` |

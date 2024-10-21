@@ -178,5 +178,26 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                }}");
             return sb.ToString();
         }
+
+        internal string ForSortedDictionaryProperty(PropertyRecord propertyRecord)
+        {
+            var genericType1 = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var genericType2 = propertyRecord.GenericTypeArguments[1].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var sb = new StringBuilder();
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    var sortedList = new {propertyRecord.Symbol.Type.Name}<{genericType1}, {genericType2}>();");
+            sb.AppendLine($"");
+            sb.AppendLine($"                    if (this.{propertyRecord.Symbol.Name} is not null)");
+            sb.AppendLine($"                    {{");
+            sb.AppendLine($"                        var chunkPairs = this.{propertyRecord.Symbol.Name}.Skip(i).Take(chunkSize);");
+            sb.AppendLine($"                        foreach(var kvp in chunkPairs)");
+            sb.AppendLine($"                        {{");
+            sb.AppendLine($"                            sortedList.Add(kvp.Key, kvp.Value);");
+            sb.AppendLine($"                        }}");
+            sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = sortedList;");
+            sb.AppendLine($"                    }}");
+            sb.AppendLine($"                }}");
+            return sb.ToString();
+        }
     }
 }

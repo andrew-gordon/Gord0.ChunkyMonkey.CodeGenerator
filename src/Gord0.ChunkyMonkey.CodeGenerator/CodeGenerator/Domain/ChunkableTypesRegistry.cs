@@ -149,6 +149,15 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
 
+                    new TypeRecord(
+                        Name: "SortedDictionary<TKey, TValue>",
+                        TypeMatcher: x => x.IsGenericType("System.Collections.Generic.SortedDictionary<TKey, TValue>") && x.GetMethod != null && x.SetMethod != null,
+                        LengthPropertyName: "Count",
+                        RequiresTemporaryListForMergingChunks: true,
+                        ChunkCodeFactory: chunkCodeFactory.ForSortedDictionaryProperty,
+                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForSortedDictionaryProperty,
+                        PreMergeChunksCodeFactory: null,
+                        PostMergeChunksCodeFactory: null),
 
                 ]);
 
