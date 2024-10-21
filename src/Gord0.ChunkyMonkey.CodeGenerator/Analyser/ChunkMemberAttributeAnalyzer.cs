@@ -22,7 +22,8 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
             DiagnosticDescriptors.InvalidUseOfChunkAttributesRule,
             DiagnosticDescriptors.NonAbstractMemberRule,
-            DiagnosticDescriptors.NonStaticMemberRule
+            DiagnosticDescriptors.NonStaticMemberRule,
+            DiagnosticDescriptors.NonSupportedChunkingTypeWithChunkMemberRule
             ];
 
         public override void Initialize(AnalysisContext context)
@@ -56,21 +57,27 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
 
             var properties = classPropertyEvaluator.GetProperties(classRecord, removeIgnoredProperties: false);
 
-            if (properties.Any(p => p.IsClassChunked && p.IsMemberChunked))
+            if (properties.Any(p => p.IsClassDecoratedWithChunkAttribute && p.IsMemberDecoratedWithChunkMemberAttribute))
             {
                 var diagnostic = Diagnostic.Create(DiagnosticDescriptors.InvalidUseOfChunkAttributesRule, classDeclaration.Identifier.GetLocation());
                 context.ReportDiagnostic(diagnostic);
             }
 
-            if (properties.Any(p => p.IsMemberChunked && p.Symbol.IsAbstract))
+            if (properties.Any(p => p.IsMemberDecoratedWithChunkMemberAttribute && p.Symbol.IsAbstract))
             {
                 var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NonAbstractMemberRule, classDeclaration.Identifier.GetLocation());
                 context.ReportDiagnostic(diagnostic);
             }
 
-            if (properties.Any(p => p.IsMemberChunked && p.Symbol.IsStatic))
+            if (properties.Any(p => p.IsMemberDecoratedWithChunkMemberAttribute && p.Symbol.IsStatic))
             {
                 var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NonStaticMemberRule, classDeclaration.Identifier.GetLocation());
+                context.ReportDiagnostic(diagnostic);
+            }
+
+            if (properties.Any(p => p.IsMemberDecoratedWithChunkMemberAttribute && !p.IsChunkable))
+            {
+                var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NonSupportedChunkingTypeWithChunkMemberRule, classDeclaration.Identifier.GetLocation());
                 context.ReportDiagnostic(diagnostic);
             }
         }

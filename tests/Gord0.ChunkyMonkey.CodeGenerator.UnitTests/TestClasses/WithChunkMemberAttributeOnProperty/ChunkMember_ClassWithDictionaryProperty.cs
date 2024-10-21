@@ -4,10 +4,8 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.TestClasses.WithChunkMember
 {
      public partial class ChunkMember_ClassWithDictionaryProperty
     {
-        [ChunkMember]
         public string? Name { get; set; }
 
-        [ChunkMember]
         public int? Age { get; set; }
 
         [ChunkMember]

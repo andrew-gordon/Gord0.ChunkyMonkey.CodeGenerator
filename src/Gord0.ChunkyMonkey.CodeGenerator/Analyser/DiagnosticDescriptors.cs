@@ -59,5 +59,15 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             "Usage",
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
+
+        public static readonly DiagnosticDescriptor NonSupportedChunkingTypeWithChunkMemberRule = new(
+            "CMKY0008",
+            "Invalid use of ChunkMemberAtribute on a member with a type that ChunkyMonkey cannot chunk",
+            "ChunkMemberAtribute cannot be applied to a member with a type that ChunkyMonkey cannot chunk",
+            "Usage",
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
+        
     }
 }

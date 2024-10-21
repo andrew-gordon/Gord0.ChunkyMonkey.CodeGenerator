@@ -39,8 +39,8 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         public string? TemporaryListVariableNameForArray { get; set; } = temporaryListVariableNameForArrays;
 
         public bool IsArray { get; } = isArray;
-        public bool IsClassChunked { get; } = isClassChunked;
-        public bool IsMemberChunked { get; } = isMemberChunked;
+        public bool IsClassDecoratedWithChunkAttribute { get; } = isClassChunked;
+        public bool IsMemberDecoratedWithChunkMemberAttribute { get; } = isMemberChunked;
         public ITypeSymbol? ArrayElementType { get; } = arrayElementType;
         public bool IsChunkable => TypeRecord != null;
     }
