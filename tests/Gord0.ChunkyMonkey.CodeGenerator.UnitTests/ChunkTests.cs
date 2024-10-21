@@ -260,6 +260,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
             Assert.Single(result.Select(x => x.Age).Distinct());
         }
 
+
         [Fact]
         public void Chunk_HashSetProperty_ReturnsChunkedInstances()
         {
@@ -513,6 +514,71 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
             // TODO: Test LotteryNumbers
             // TODO: Test FavouriteNumbers
             // TODO: Test FavouriteFilms
+        }
+
+        [Fact]
+        public void ChunkSortedListProperty_ReturnsChunkedInstances()
+        {
+            var sortedList = new SortedList<string, int>
+            {
+                { "One", 1 },
+                { "Two", 2 },
+                { "Three", 3 },
+                { "Four", 4 },
+                { "Five", 5 },
+                { "Six", 6 },
+                { "Seven", 7 },
+                { "Eight", 8 },
+                { "Nine", 9 },
+                { "Ten", 10 }
+            };
+
+            // Arrange
+            var instance = new Chunk_ClassWithSortedListProperty
+            {
+                Numbers = sortedList
+            };
+
+            int chunkSize = 3;
+
+            // Act
+            var result = instance.Chunk(chunkSize).ToList();
+
+            // Assert
+            Assert.Equal(4, result.Count);
+
+            // NB: The keys are sorted so will appear in alphabetical order
+
+            var expected1 = new SortedList<string, int>
+            {
+                { "Eight", 8 },
+                { "Five", 5 },
+                { "Four", 4 },
+            };
+
+            var expected2 = new SortedList<string, int>
+            {
+                { "Nine", 9 },
+                { "One", 1 },
+                { "Seven", 7 },
+            };
+
+            var expected3 = new SortedList<string, int>
+            {
+                { "Six", 6 },
+                { "Ten", 10 },
+                { "Three", 3 }
+            };
+
+            var expected4 = new SortedList<string, int>
+            {
+                { "Two", 2 }
+            };
+
+            Assert.Equal(expected1, result[0].Numbers);
+            Assert.Equal(expected2, result[1].Numbers);
+            Assert.Equal(expected3, result[2].Numbers);
+            Assert.Equal(expected4, result[3].Numbers);
         }
     }
 }

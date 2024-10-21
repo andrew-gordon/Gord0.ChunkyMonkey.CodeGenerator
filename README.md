@@ -318,7 +318,6 @@ This generated method merges a set of chunks back into a single instance.
 ## Future Enhancements
 
 - Support `System.Collections.Generic.SortedDictionary<TKey, TValue>`
-- Support `System.Collections.Generic.SortedList<TKey, TValue>`
 - Support `System.Collections.Generic.Stack<T>`
 - Support `System.Collections.Generic.Queue<T>`
 - Support `System.Collections.Generic.PriorityQueue<T>`
@@ -354,3 +353,4 @@ This generated method merges a set of chunks back into a single instance.
 | 2.0.13  | Added support for `System.Collections.ObjectModel.ReadOnlyCollection<T>` |
 | 2.0.14  | Added support for `System.ArraySegment<T>` |
 | 2.0.15  | Added support for `System.Collections.Immutable.ImmutableList` & `System.Collections.Specialized.StringCollection` |
+| 2.0.16  | Added support for `System.Collections.Generic.SortedList<TKey, TValue>` |

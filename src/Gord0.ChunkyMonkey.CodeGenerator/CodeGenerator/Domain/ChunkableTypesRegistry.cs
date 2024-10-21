@@ -1,6 +1,7 @@
 ﻿using Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories;
 using Gord0.ChunkyMonkey.CodeGenerator.Extensions;
 using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection.Metadata;
 
@@ -137,7 +138,19 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForStringCollectionProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
-                ]);;
+
+                    new TypeRecord(
+                        Name: "SortedList<TKey, TValue>",
+                        TypeMatcher: x => x.IsGenericType("System.Collections.Generic.SortedList<TKey, TValue>") && x.GetMethod != null && x.SetMethod != null,
+                        LengthPropertyName: "Count",
+                        RequiresTemporaryListForMergingChunks: true,
+                        ChunkCodeFactory: chunkCodeFactory.ForSortedListProperty,
+                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForSortedListProperty,
+                        PreMergeChunksCodeFactory: null,
+                        PostMergeChunksCodeFactory: null),
+
+
+                ]);
 
                 typeRecords = new ReadOnlyCollection<TypeRecord>(list);
             }

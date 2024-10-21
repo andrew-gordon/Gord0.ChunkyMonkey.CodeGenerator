@@ -122,34 +122,42 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
                 .Where(x => x.TypeRecord is null)
                 .ToImmutableArray();
 
-            if (chunkCollectionProperties.Any())
+            switch(chunkCollectionProperties.Length)
             {
-                sb.AppendLine($"            long biggestCollectionLength = new long[] {{");
-                foreach (var property in chunkCollectionProperties)
-                {
-                    if (property.IsValueType)
-                    {
-                        sb.Append($"                this.{property.Symbol.Name}.{property.TypeRecord!.LengthPropertyName}");
-                    } 
-                    else
-                    {
-                        sb.Append($"                (this.{property.Symbol.Name} is not null) ? this.{property.Symbol.Name}.{property.TypeRecord!.LengthPropertyName} : 0");
-                    }
+                case 0:
+                    sb.AppendLine($"            long biggestCollectionLength = 0;");
+                    break;
 
-                    if (property != chunkCollectionProperties.Last())
+                case 1:
                     {
-                        sb.AppendLine(", ");
+                        var property = chunkCollectionProperties[0];
+                        string line = property.IsValueType
+                            ? $"this.{property.Symbol.Name}.{property.TypeRecord!.LengthPropertyName}"
+                            : $"(this.{property.Symbol.Name} is not null) ? this.{property.Symbol.Name}.{property.TypeRecord!.LengthPropertyName} : 0";
+                        sb.AppendLine($"            long biggestCollectionLength = {line};");
                     }
-                    else
+                    break;
+
+                default:
                     {
-                        sb.AppendLine("");
+                        sb.AppendLine($"            long biggestCollectionLength = new long[] {{");
+                        foreach (var property in chunkCollectionProperties)
+                        {
+                            var line = property.IsValueType
+                                ? $"                this.{property.Symbol.Name}.{property.TypeRecord!.LengthPropertyName}"
+                                : $"                (this.{property.Symbol.Name} is not null) ? this.{property.Symbol.Name}.{property.TypeRecord!.LengthPropertyName} : 0";
+
+
+                            if (property != chunkCollectionProperties.Last())
+                            {
+                                line += ",";
+                            }
+
+                            sb.AppendLine(line);
+                        }
+                        sb.AppendLine($"            }}.Max();");
                     }
-                }
-                sb.AppendLine($"            }}.Max();");
-            }
-            else
-            {
-                sb.AppendLine($"            long biggestCollectionLength = 0;");
+                    break;
             }
 
             sb.AppendLine($"");
@@ -159,15 +167,11 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 
             foreach (var property in classProperties)
             {
-                if (property.HasSupportedTypeForChunking)
-                {
-                    var line = property.TypeRecord!.ChunkCodeFactory(property);
-                    sb.AppendLine(line);
-                }
-                else
-                {
-                    sb.AppendLine($"                instance.{property.Symbol.Name} = this.{property.Symbol.Name};");
-                }
+                var line = property.HasSupportedTypeForChunking 
+                    ? property.TypeRecord!.ChunkCodeFactory(property)
+                    : $"                instance.{property.Symbol.Name} = this.{property.Symbol.Name};";
+
+                sb.AppendLine(line);
             }
 
             sb.AppendLine($"                yield return instance;");
@@ -208,19 +212,21 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             sb.AppendLine($"            foreach(var chunk in chunks)");
             sb.AppendLine($"            {{");
 
-
-            sb.AppendLine($"                if (chunkNumber > 0)");
-            sb.AppendLine($"                {{");
-
-            foreach (var property in nonChunkedProperties)
+            if (nonChunkedProperties.Any())
             {
-                sb.AppendLine($"                    if ({property.LastValueVariableName} != chunk.{property.Symbol.Name})");
-                sb.AppendLine($"                    {{");
-                sb.AppendLine($"                        throw new InvalidDataException(\"Chunks contain different values for non-chunked property '{property.Symbol.Name}'\");");
-                sb.AppendLine($"                    }}");
+                sb.AppendLine($"                if (chunkNumber > 0)");
+                sb.AppendLine($"                {{");
+
+                foreach (var property in nonChunkedProperties)
+                {
+                    sb.AppendLine($"                    if ({property.LastValueVariableName} != chunk.{property.Symbol.Name})");
+                    sb.AppendLine($"                    {{");
+                    sb.AppendLine($"                        throw new InvalidDataException(\"Chunks contain different values for non-chunked property '{property.Symbol.Name}'\");");
+                    sb.AppendLine($"                    }}");
+                }
+                sb.AppendLine($"                }}");
+                sb.AppendLine("");
             }
-            sb.AppendLine($"                }}");
-            sb.AppendLine("");
 
             foreach (var property in classProperties)
             {
@@ -265,50 +271,6 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             var code = sb.ToString();
 
             return code;
-        }
-
-        /// <summary>
-        /// Checks if the specified attribute is applied to any property of the class symbol.
-        /// </summary>
-        /// <param name="attributeFullTypeName">The full type name of the attribute.</param>
-        /// <param name="classSymbol">The class symbol to check.</param>
-        /// <returns>True if the attribute is applied to any property, otherwise false.</returns>
-        private bool IsAttributeAppliedToAnyProperty(string attributeFullTypeName, INamedTypeSymbol classSymbol)
-        {
-            var symbols = classSymbol
-                .GetMembers()
-                .OfType<IPropertySymbol>();
-
-            foreach (var symbol in symbols)
-            {
-                var hasChunkMemberAttribute = GetAttributeForSymbol(attributeFullTypeName, symbol) is not null;
-                if (hasChunkMemberAttribute)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Gets the attribute data for the specified attribute full type name and symbol.
-        /// </summary>
-        /// <param name="attributeFullTypeName">The full type name of the attribute.</param>
-        /// <param name="symbol">The symbol to check for the attribute.</param>
-        /// <returns>The attribute data if the attribute is found, otherwise null.</returns>
-        private AttributeData GetAttributeForSymbol(string attributeFullTypeName, ISymbol symbol)
-        {
-            var result = symbol.GetAttributes()
-                .Where(attr =>
-                {
-                    var fullAttributeName = attr.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-                    bool hasChunkAttribute = $"global::{attributeFullTypeName}" == fullAttributeName;
-                    return hasChunkAttribute;
-                })
-                .FirstOrDefault();
-
-            return result;
         }
     }
 }
