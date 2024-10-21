@@ -18,17 +18,27 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             return sb.ToString();
         }
 
+        internal string ForArraySegmentProperty(PropertyRecord propertyRecord)
+        {
+            var typeArg = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var sb = new StringBuilder();
+            sb.AppendLine($"            List<{typeArg}>? {propertyRecord.TemporaryListVariableNameForArray} = null;");
+            return sb.ToString();
+        }
+
         internal string ForImmutableArrayProperty(PropertyRecord propertyRecord)
         {
+            var typeArg = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             var sb = new StringBuilder();
-            sb.AppendLine($"            List<{propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}>? {propertyRecord.TemporaryListVariableNameForArray} = null;");
+            sb.AppendLine($"            List<{typeArg}>? {propertyRecord.TemporaryListVariableNameForArray} = null;");
             return sb.ToString();
         }
 
         internal string ForReadOnlyCollectionProperty(PropertyRecord propertyRecord)
         {
+            var typeArg = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             var sb = new StringBuilder();
-            sb.AppendLine($"            List<{propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}>? {propertyRecord.TemporaryListVariableNameForArray} = null;");
+            sb.AppendLine($"            List<{typeArg}>? {propertyRecord.TemporaryListVariableNameForArray} = null;");
             return sb.ToString();
         }
     }

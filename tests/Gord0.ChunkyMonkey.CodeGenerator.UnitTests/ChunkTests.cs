@@ -44,6 +44,49 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
         }
 
         [Fact]
+        public void Chunk_ArraySegmentProperty_ReturnsChunkedInstances()
+        {
+            // Arrange
+            var instance = new Chunk_ClassWithArraySegmentProperty
+            {
+                Name = "John",
+                Age = 25,
+                Numbers = new ArraySegment<int>([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+            };
+            int chunkSize = 3;
+
+
+            // Act
+            var result = instance.Chunk(chunkSize).ToList();
+
+            // Assert
+            Assert.Equal(4, result.Count);
+
+            Assert.Equal(instance.Name, result[0].Name);
+            Assert.Equal(instance.Age, result[0].Age);
+            int[] expectedNumbers = [1, 2, 3];
+            Assert.True(expectedNumbers.SequenceEqual(result[0].Numbers));
+
+            Assert.Equal(instance.Name, result[1].Name);
+            Assert.Equal(instance.Age, result[1].Age);
+            expectedNumbers = [4, 5, 6];
+            Assert.True(expectedNumbers.SequenceEqual(result[1].Numbers));
+
+            Assert.Equal(instance.Name, result[2].Name);
+            Assert.Equal(instance.Age, result[2].Age);
+            expectedNumbers = [7, 8, 9];
+            Assert.True(expectedNumbers.SequenceEqual(result[2].Numbers));
+
+            Assert.Equal(instance.Name, result[3].Name);
+            Assert.Equal(instance.Age, result[3].Age);
+            expectedNumbers = [10];
+            Assert.True(expectedNumbers.SequenceEqual(result[3].Numbers));
+
+            Assert.Single(result.Select(x => x.Name).Distinct());
+            Assert.Single(result.Select(x => x.Age).Distinct());
+        }
+
+        [Fact]
         public void Chunk_ImmutableArrayProperty_ReturnsChunkedInstances()
         {
             // Arrange

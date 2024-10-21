@@ -77,9 +77,8 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                     }
 
                     var lastValueVariableName = "lastValue_" + p.Name;
-                    var temporaryListVariableNameForArray = isArray || p.IsGenericType("System.Collections.Immutable.ImmutableArray<T>") || p.IsGenericType("System.Collections.ObjectModel.ReadOnlyCollection<T>") 
-                        ? "tempArrayList_" + p.Name 
-                        : null;
+                    var requiresTemporaryListForMergingChunks = typeRule?.RequiresTemporaryListForMergingChunks ?? false;
+                    var temporaryListVariableNameForArray = requiresTemporaryListForMergingChunks ? lastValueVariableName : null;
 
                     var standardArrayElementType = isArray ? ((IArrayTypeSymbol)p.Type).ElementType : null;
 

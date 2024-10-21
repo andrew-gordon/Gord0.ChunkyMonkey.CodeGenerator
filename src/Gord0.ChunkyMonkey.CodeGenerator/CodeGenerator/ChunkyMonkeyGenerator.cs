@@ -21,7 +21,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
         /// <param name="context">The IncrementalGeneratorInitializationContext.</param>
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            //System.Diagnostics.Debugger.Launch();
+            // System.Diagnostics.Debugger.Launch();
 
             var classRecords = context.SyntaxProvider
                 .CreateSyntaxProvider(
@@ -79,11 +79,19 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 
             var sb = new StringBuilder();
 
-            sb.AppendLine("using System;");
-            sb.AppendLine("using System.Collections.Generic;");
-            sb.AppendLine("using System.Collections.Immutable;");
-            sb.AppendLine("using System.Collections.ObjectModel;");
-            sb.AppendLine("using System.Linq;");
+            var usings = new[] {
+                "System",
+                "System.Collections.Generic",
+                "System.Collections.Immutable",
+                "System.Collections.ObjectModel",
+                "System.Linq"
+            };
+
+            foreach(var @using in usings)
+            {
+                sb.AppendLine($"using {@using};");
+            }
+
             sb.AppendLine("");
 
             sb.AppendLine($"namespace {namespaceText}");

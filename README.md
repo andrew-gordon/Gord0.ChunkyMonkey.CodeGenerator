@@ -313,6 +313,27 @@ This generated method merges a set of chunks back into a single instance.
 
 <br>
 
+## Future Enhancements
+
+- Support `System.Collections.Generic.SortedDictionary<TKey, TValue>`
+- Support `System.Collections.Generic.SortedList<TKey, TValue>`
+- Support `System.Collections.Generic.Stack<T>`
+- Support `System.Collections.Generic.Queue<T>`
+- Support `System.Collections.Generic.PriorityQueue<T>`
+- Support `System.Collections.Specialized.NameValueCollection`
+- Support `System.Collections.Specialized.StringCollection`
+- Support `System.Collections.Specialized.BitArray`
+- Support `System.Collections.Immutable.ImmutableList`
+- Support `System.Collections.Immutable.ImmutableHashSet`
+- Support `System.Collections.ObjectModel.ObservableCollection<T>`
+- Support `System.Collections.ObjectModel.ReadOnlyObservableCollection<TKey>`
+- Support `Span<T>`
+- Support `ReadOnlySpan<T>`
+- Support `Memory<T>`
+- Support `ReadOnlyMemory<T>`
+- Analyzer warning when `[Chunk]` is used on a class containing a property without a getter and setter.
+- Analyzer warning when `[ChunkMember]` is applied to a property without a getter and setter.
+
 ## Versions
 
 | Version | Description |
@@ -332,3 +353,4 @@ This generated method merges a set of chunks back into a single instance.
 | 2.0.11  | Minor fixes | ChunkMemberAttributeAnalyzer |
 | 2.0.12  | Fixed code analyser rules: NoAccessibleChunkablePropertiesRule, NoChunkablePropertiesRule & NonSupportedChunkingTypeWithChunkMemberRule.<br>Parameterised NonSupportedChunkingTypeWithChunkMemberRule<br>PropertyRecord now has a GenericTypeArguments property<br>PropertyRecord.IsChunkable-> PropertyRecord.HasSupportedTypeForChunking<br>Support for `ImmutableArray<T>` |
 | 2.0.13  | Added support for `System.Collections.ObjectModel.ReadOnlyCollection<T>` |
+| 2.0.14  | Added support for `System.ArraySegment<T>` |

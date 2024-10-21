@@ -18,15 +18,27 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"            {{");
             sb.AppendLine($"                instance.{propertyRecord.Symbol.Name} = {propertyRecord.TemporaryListVariableNameForArray}.ToArray();");
             sb.AppendLine($"            }}");
-
             sb.AppendLine($"            else");
-
             var value = (propertyRecord.Symbol.Type.NullableAnnotation == Microsoft.CodeAnalysis.NullableAnnotation.Annotated) ? "null" : "[]";
-            {
-                sb.AppendLine($"            {{");
-                sb.AppendLine($"                instance.{propertyRecord.Symbol.Name} = {value};");
-                sb.AppendLine($"            }}");
-            }
+            sb.AppendLine($"            {{");
+            sb.AppendLine($"                instance.{propertyRecord.Symbol.Name} = {value};");
+            sb.AppendLine($"            }}");
+            return sb.ToString();
+        }
+
+        internal string ForArraySegmentProperty(PropertyRecord propertyRecord)
+        {
+            var genericType = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var sb = new StringBuilder();
+            sb.AppendLine($"            if ({propertyRecord.TemporaryListVariableNameForArray} is not null)");
+            sb.AppendLine($"            {{");
+            sb.AppendLine($"                instance.{propertyRecord.Symbol.Name} = new ArraySegment<{genericType}>({propertyRecord.TemporaryListVariableNameForArray}.ToArray());");
+            sb.AppendLine($"            }}");
+            sb.AppendLine($"            else");
+            var value = (propertyRecord.Symbol.Type.NullableAnnotation == Microsoft.CodeAnalysis.NullableAnnotation.Annotated) ? "null" : "[]";
+            sb.AppendLine($"            {{");
+            sb.AppendLine($"                instance.{propertyRecord.Symbol.Name} = {value};");
+            sb.AppendLine($"            }}");
             return sb.ToString();
         }
 

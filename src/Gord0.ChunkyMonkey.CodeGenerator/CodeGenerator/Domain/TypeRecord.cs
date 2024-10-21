@@ -39,6 +39,11 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         /// <summary>
         /// Gets the function that generates the code that needs to run for the property after chunks have been processed.
         /// </summary>
-        Func<PropertyRecord, string>? PostMergeChunksCodeFactory
+        Func<PropertyRecord, string>? PostMergeChunksCodeFactory,
+
+        /// <summary>
+        /// Gets a value indicating whether the type requires a temporary list when merging chunks.
+        /// </summary>
+        bool? RequiresTemporaryListForMergingChunks = false
     );
 }

@@ -205,5 +205,27 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                {propertyRecord.TemporaryListVariableNameForArray}.AddRange(chunk.{propertyRecord.Symbol.Name});");
             return sb.ToString();
         }
+
+        internal string ForArraySegmentProperty(PropertyRecord propertyRecord)
+        {
+            var propertyType = propertyRecord.Symbol.Type;
+            if (propertyType is INamedTypeSymbol namedType && namedType.IsGenericType)
+            {
+                var typeArg = namedType.TypeArguments[0];
+                var typeArgString = typeArg.ToDisplayString();
+                var sb = new StringBuilder();
+                sb.AppendLine($"                if ({propertyRecord.TemporaryListVariableNameForArray} is null)");
+                sb.AppendLine($"                {{");
+                sb.AppendLine($"                    {propertyRecord.TemporaryListVariableNameForArray} = new List<{typeArgString}>();");
+                sb.AppendLine($"                }}");
+                sb.AppendLine($"");
+                sb.AppendLine($"                {propertyRecord.TemporaryListVariableNameForArray}.AddRange(chunk.{propertyRecord.Symbol.Name});");
+                return sb.ToString();
+            }
+            else
+            {
+                throw new NotSupportedException("ChunkyMonkey does not support this collection: " + propertyRecord.Symbol);
+            }
+        }
     }
 }

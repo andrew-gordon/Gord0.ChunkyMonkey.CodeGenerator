@@ -21,14 +21,21 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             return sb.ToString();
         }
 
+        internal string ForArraySegmentProperty(PropertyRecord propertyRecord)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    instance.{propertyRecord.Symbol.Name} = this.{propertyRecord.Symbol.Name}.Skip(i).Take(chunkSize).ToArray();");
+            sb.AppendLine($"                }}");
+            return sb.ToString();
+        }
+
         internal string ForImmutableArrayProperty(PropertyRecord propertyRecord)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"                {{");
-            //sb.AppendLine($"                    if (this.{propertyRecord.Symbol.Name} is not null)");
-            //sb.AppendLine($"                    {{");
+            // Don't perform null check as ImmutableArray is a value type.
             sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = this.{propertyRecord.Symbol.Name}.Skip(i).Take(chunkSize).ToImmutableArray();");
-            //sb.AppendLine($"                    }}");
             sb.AppendLine($"                }}");
             return sb.ToString();
         }
