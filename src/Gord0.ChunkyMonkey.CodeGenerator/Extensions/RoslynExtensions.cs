@@ -70,6 +70,50 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Extensions
             var fullAttributeName = attributeType?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             return fullAttributeName;
         }
+
+        /// <summary>
+        /// Checks if the specified attribute is applied to any property of the class symbol.
+        /// </summary>
+        /// <param name="attributeFullTypeName">The full type name of the attribute.</param>
+        /// <param name="classSymbol">The class symbol to check.</param>
+        /// <returns>True if the attribute is applied to any property, otherwise false.</returns>
+        public static bool IsAttributeAppliedToAnyProperty(this INamedTypeSymbol classSymbol, string attributeFullTypeName)
+        {
+            var symbols = classSymbol
+                .GetMembers()
+                .OfType<IPropertySymbol>();
+
+            foreach (var symbol in symbols)
+            {
+                var hasChunkMemberAttribute = GetAttribute(symbol, attributeFullTypeName) is not null;
+                if (hasChunkMemberAttribute)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the attribute data for the specified attribute full type name and symbol.
+        /// </summary>
+        /// <param name="attributeFullTypeName">The full type name of the attribute.</param>
+        /// <param name="symbol">The symbol to check for the attribute.</param>
+        /// <returns>The attribute data if the attribute is found, otherwise null.</returns>
+        public static AttributeData GetAttribute(this ISymbol symbol, string attributeFullTypeName)
+        {
+            var result = symbol.GetAttributes()
+                .Where(attr =>
+                {
+                    var fullAttributeName = attr.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+                    bool hasChunkAttribute = $"global::{attributeFullTypeName}" == fullAttributeName;
+                    return hasChunkAttribute;
+                })
+                .FirstOrDefault();
+
+            return result;
+        }
     }
 }
 

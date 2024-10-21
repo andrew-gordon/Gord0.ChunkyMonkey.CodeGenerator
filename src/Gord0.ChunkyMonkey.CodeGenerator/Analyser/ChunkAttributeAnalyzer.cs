@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain;
+using Gord0.ChunkyMonkey.CodeGenerator.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -7,34 +8,22 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
 {
+
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ChunkAttributeAnalyzer : DiagnosticAnalyzer
-    {
-        private static readonly DiagnosticDescriptor NonAbstractClassRule = new(
-            "CMKY0001",
-            "Invalid use of ChunkAttribute on an abstract class",
-            "ChunkAttribute cannot be applied to an abstract class",
-            "Usage",
-            DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
+    {      
+        private readonly ClassPropertyEvaluator classPropertyEvaluator;
 
-        private static readonly DiagnosticDescriptor NonStaticClassRule = new(
-            "CMKY0002",
-            "Invalid use of ChunkAttribute on a static class",
-            "ChunkAttribute cannot be applied to a static class",
-            "Usage",
-            DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
+        public ChunkAttributeAnalyzer()
+        {
+            this.classPropertyEvaluator = new ClassPropertyEvaluator();
+        }
 
-        private static readonly DiagnosticDescriptor ClassWithParameterlessContructorRule = new(
-            "CMKY0003",
-            "Invalid use of ChunkAttribute on class without parameterless constructor",
-            "ChunkAttribute can only be applied to a class with a parameterless constructor",
-            "Usage",
-            DiagnosticSeverity.Error,
-            isEnabledByDefault: true);
-
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [NonAbstractClassRule, NonStaticClassRule, ClassWithParameterlessContructorRule];
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
+            DiagnosticDescriptors.NonAbstractClassRule, 
+            DiagnosticDescriptors.NonStaticClassRule, 
+            DiagnosticDescriptors.ClassWithParameterlessContructorRule, 
+            DiagnosticDescriptors.NoChunkablePropertiesRule];
 
         public override void Initialize(AnalysisContext context)
         {
@@ -57,8 +46,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             }
 
             // Check if the class has the ChunkAttribute
-            var hasCustomAttribute = classSymbol.GetAttributes().Any(attr =>
-                attr.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == AttributeFullTypeNames.Chunk);
+            var hasCustomAttribute = classSymbol.GetAttribute(attributeFullTypeName: AttributeFullTypeNames.Chunk) is not null;
 
             if (!hasCustomAttribute)
             {
@@ -70,25 +58,31 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
 
             if (isAbstract)
             {
-                // Report a diagnostic if the class violates the rules
-                var diagnostic = Diagnostic.Create(NonAbstractClassRule, classDeclaration.Identifier.GetLocation());
+                var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NonAbstractClassRule, classDeclaration.Identifier.GetLocation());
                 context.ReportDiagnostic(diagnostic);
             }
             if (isStatic)
             {
-                // Report a diagnostic if the class violates the rules
-                var diagnostic = Diagnostic.Create(NonStaticClassRule, classDeclaration.Identifier.GetLocation());
+                var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NonStaticClassRule, classDeclaration.Identifier.GetLocation());
                 context.ReportDiagnostic(diagnostic);
             }
 
-            // Check if the class has a parameterless constructor
             bool hasParameterlessConstructor = classSymbol.Constructors
                 .Any(constructor => constructor.Parameters.IsEmpty && !constructor.IsStatic);
 
-            // If the class does not have a parameterless constructor, report a diagnostic
             if (!hasParameterlessConstructor)
             {
-                var diagnostic = Diagnostic.Create(ClassWithParameterlessContructorRule, classDeclaration.Identifier.GetLocation());
+                var diagnostic = Diagnostic.Create(DiagnosticDescriptors.ClassWithParameterlessContructorRule, classDeclaration.Identifier.GetLocation());
+                context.ReportDiagnostic(diagnostic);
+            }
+
+            var classRecord = new ClassRecord(classSymbol);
+
+            var properties = classPropertyEvaluator.GetProperties(classRecord);
+
+            if (!properties.Any(x => x.IsChunkable))
+            {
+                var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NoChunkablePropertiesRule, classDeclaration.Identifier.GetLocation());
                 context.ReportDiagnostic(diagnostic);
             }
         }

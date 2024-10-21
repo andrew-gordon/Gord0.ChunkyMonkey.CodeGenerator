@@ -1,18 +1,14 @@
 ﻿using Gord0.ChunkMonkey.Attributes;
-using System.Collections.ObjectModel;
 
-namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.TestClasses
+namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.TestClasses.WithChunkAttributeOnClass
 {
-    [Chunk]
-    public partial class ClassWithMultipleCollectionProperties
+    [Chunk(Accessibility.Public)]
+    public partial class Chunk_ClassWithDictionaryProperty
     {
         public string? Name { get; set; }
         public int Age { get; set; }
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         public Dictionary<string, string> Attributes { get; set; }
-        public Collection<int> FavouriteNumbers { get; set; }
-        public List<int> LotteryNumbers { get; set; }
-        public string[] FavouriteFilms { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     }
 }

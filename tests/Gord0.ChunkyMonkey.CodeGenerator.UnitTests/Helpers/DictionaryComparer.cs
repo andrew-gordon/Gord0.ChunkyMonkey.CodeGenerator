@@ -3,7 +3,7 @@
     /// <summary>
     /// Helper class for comparing dictionaries.
     /// </summary>
-    internal class DictionaryComparer
+    public class DictionaryComparer
     {
         /// <summary>
         /// Compares two dictionaries for equality.
@@ -13,7 +13,7 @@
         /// <param name="dict1">The first dictionary to compare.</param>
         /// <param name="dict2">The second dictionary to compare.</param>
         /// <returns><c>true</c> if the dictionaries are equal; otherwise, <c>false</c>.</returns>
-        public static bool Compare<TKey, TValue>(Dictionary<TKey, TValue> dict1, Dictionary<TKey, TValue> dict2) where TKey : notnull
+        public static bool Compare<TKey, TValue>(IDictionary<TKey, TValue> dict1, IDictionary<TKey, TValue> dict2) where TKey : notnull
         {
             // Check if both dictionaries are null or the same reference
             if (ReferenceEquals(dict1, dict2)) return true;

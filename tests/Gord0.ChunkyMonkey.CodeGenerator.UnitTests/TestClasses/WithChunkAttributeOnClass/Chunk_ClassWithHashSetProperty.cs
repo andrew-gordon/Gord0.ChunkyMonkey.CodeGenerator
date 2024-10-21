@@ -1,9 +1,9 @@
 ﻿using Gord0.ChunkMonkey.Attributes;
 
-namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.TestClasses
+namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.TestClasses.WithChunkAttributeOnClass
 {
     [Chunk]
-    public sealed partial class ClassWithHashSetProperty
+    public sealed partial class Chunk_ClassWithHashSetProperty
     {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         public string Name { get; set; }

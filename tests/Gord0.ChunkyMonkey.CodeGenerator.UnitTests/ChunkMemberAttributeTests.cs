@@ -1,15 +1,15 @@
 ﻿using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Helpers;
-using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.TestClasses;
+using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.TestClasses.WithChunkMemberAttributeOnProperty;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
 {
-    public class ChunkTests
+    public partial class ChunkMemberAttributeTests
     {
         [Fact]
-        public void Chunk_ArrayProperty_ReturnsChunkedInstances()
+        public void ChunkMember_ArrayProperty_ReturnsChunkedInstances()
         {
             // Arrange
-            var instance = new ClassWithArrayProperty
+            var instance = new ChunkMember_ClassWithArrayProperty
             {
                 Name = "John",
                 Age = 25,
@@ -44,10 +44,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
         }
 
         [Fact]
-        public void Chunk_HashSetProperty_ReturnsChunkedInstances()
+        public void ChunkMember_HashSetProperty_ReturnsChunkedInstances()
         {
             // Arrange
-            var instance = new ClassWithHashSetProperty
+            var instance = new ChunkMember_ClassWithHashSetProperty
             {
                 Name = "John",
                 Age = 25,
@@ -82,10 +82,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
         }
 
         [Fact]
-        public void Chunk_SortedSetProperty_ReturnsChunkedInstances()
+        public void ChunkMember_SortedSetProperty_ReturnsChunkedInstances()
         {
             // Arrange
-            var instance = new ClassWithSortedSetProperty
+            var instance = new ChunkMember_ClassWithSortedSetProperty
             {
                 Name = "John",
                 Age = 25,
@@ -121,7 +121,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
 
 
         //[Fact]
-        //public void Chunk_NullableArrayProperty_ReturnsChunkedInstances()
+        //public void ChunkMember_NullableArrayProperty_ReturnsChunkedInstances()
         //{
         //    // Arrange
         //    var instance = new ClassWithNullableArrayProperty
@@ -160,10 +160,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
         //}
 
         [Fact]
-        public void Chunk_ListProperty_ReturnsChunkedInstances()
+        public void ChunkMember_ListProperty_ReturnsChunkedInstances()
         {
             // Arrange
-            var instance = new ClassWithListProperty
+            var instance = new ChunkMember_ClassWithListProperty
             {
                 Name = "John",
                 Age = 25,
@@ -198,10 +198,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
         }
 
         [Fact]
-        public void Chunk_CollectionProperty_ReturnsChunkedInstances()
+        public void ChunkMember_CollectionProperty_ReturnsChunkedInstances()
         {
             // Arrange
-            var instance = new ClassWithCollectionProperty
+            var instance = new ChunkMember_ClassWithCollectionProperty
             {
                 Name = "John",
                 Age = 25,
@@ -237,10 +237,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
         }
 
         [Fact]
-        public void Chunk_MultipleCollectionProperties_ReturnsChunkedInstances()
+        public void ChunkMember_MultipleCollectionProperties_ReturnsChunkedInstances()
         {
             // Arrange
-            var instance = new ClassWithMultipleCollectionProperties
+            var instance = new ChunkMember_ClassWithMultipleCollectionProperties
             {
                 Name = "John",
                 Age = 25,
@@ -274,7 +274,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
             var chunk1 = result[0];
             Assert.Equal(instance.Name, chunk1.Name);
             Assert.Equal(instance.Age, chunk1.Age);
-            Assert.Equal(3, chunk1.Attributes.Count);
+            Assert.Equal(3, chunk1.Attributes!.Count);
 
             {
                 var expectedAttributes = new Dictionary<string, string>
@@ -287,7 +287,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
                 Assert.True(DictionaryComparer.Compare(chunk1.Attributes, expectedAttributes));
                 {
                     var expectedFilms = new string[] { "Reservoir Dogs", "Pulp Fiction", "Inception" };
-                    Assert.True(expectedFilms.SequenceEqual(chunk1.FavouriteFilms));
+                    Assert.True(expectedFilms.SequenceEqual(chunk1.FavouriteFilms!));
                 }
 
                 // TODO: Test LotteryNumbers
@@ -302,7 +302,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
             var chunk2 = result[1];
             Assert.Equal(instance.Name, chunk2.Name);
             Assert.Equal(instance.Age, chunk2.Age);
-            Assert.Equal(2, chunk2.Attributes.Count);
+            Assert.Equal(2, chunk2.Attributes!.Count);
             {
                 var expectedAttributes = new Dictionary<string, string>
                 {
@@ -313,7 +313,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
                 Assert.True(DictionaryComparer.Compare(chunk2.Attributes, expectedAttributes));
 
                 var expectedFilms = new string[] { "The Matrix", "The Shawshank Redemption", "The Godfather" };
-                Assert.True(expectedFilms.SequenceEqual(chunk2.FavouriteFilms));
+                Assert.True(expectedFilms.SequenceEqual(chunk2.FavouriteFilms!));
                 // TODO: Test LotteryNumbers
                 // TODO: Test FavouriteNumbers
                 // TODO: Test FavouriteFilms
@@ -328,10 +328,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
             var chunk3 = result[2];
             Assert.Equal(instance.Name, chunk3.Name);
             Assert.Equal(instance.Age, chunk3.Age);
-            Assert.Empty(chunk3.Attributes);
+            Assert.Empty(chunk3.Attributes!);
             {
                 var expectedFilms = new string[] { "The Dark Knight", "Fight Club" };
-                Assert.True(expectedFilms.SequenceEqual(chunk3.FavouriteFilms));
+                Assert.True(expectedFilms.SequenceEqual(chunk3.FavouriteFilms!));
             }
             // TODO: Test LotteryNumbers
             // TODO: Test FavouriteNumbers

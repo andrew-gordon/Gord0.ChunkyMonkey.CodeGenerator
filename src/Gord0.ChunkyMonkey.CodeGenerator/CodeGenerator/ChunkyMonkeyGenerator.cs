@@ -1,9 +1,11 @@
 ﻿using Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain;
 using Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories;
+using Gord0.ChunkyMonkey.CodeGenerator.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using System;
 using System.Collections.Immutable;
 using System.Text;
 
@@ -21,7 +23,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
         /// <param name="context">The IncrementalGeneratorInitializationContext.</param>
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            // System.Diagnostics.Debugger.Launch();
+            //System.Diagnostics.Debugger.Launch();
 
             var classRecords = context.SyntaxProvider
                 .CreateSyntaxProvider(
@@ -31,13 +33,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
                         var classDeclarationSyntax = (ClassDeclarationSyntax)context.Node;
                         var classSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclarationSyntax);
 
-                        bool requiresChunking = classSymbol != null &&
-                            (GetAttributeForSymbol(AttributeFullTypeNames.Chunk, classSymbol) is not null ||
-                            IsAttributeAppliedToAnyProperty(AttributeFullTypeNames.ChunkMember, classSymbol));
-
-                        return new ClassRecord(classDeclarationSyntax, classSymbol!, requiresChunking);
+                        return new ClassRecord(classSymbol!);
                     })
-                .Where(c => c is not null && c.ClassSymbol is not null && c.RequiresChunking);
+                .Where(c => c is not null && c.ClassSymbol is not null && (c.ClassSymbol.GetAttribute(AttributeFullTypeNames.Chunk) is not null ||
+                            c.ClassSymbol.IsAttributeAppliedToAnyProperty(AttributeFullTypeNames.ChunkMember)));
 
             // Collect all the filtered classes for further processing
             var collectedClasses = classRecords.Collect();
@@ -45,32 +44,28 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             // Register a source output for processing and generating source files
             context.RegisterSourceOutput(collectedClasses, (spc, classRecords) =>
             {
+                var usedFileNames = new HashSet<string>();
+
                 foreach (var classRecord in classRecords)
                 {
                     // Generate source code for each class
                     var generatedCode = GenerateChunkingCode(classRecord!);
 
-                    spc.AddSource($"{classRecord.Name}_ChunkeyMonkey.cs", SourceText.From(generatedCode, Encoding.UTF8));
+                    var generatedSourceFilename = $"{classRecord!.Name}_ChunkyMonkey.cs";
+                    int counter = 1;
+
+                    // Esnure generatedSourceFilename is unique
+                    while (usedFileNames.Contains(generatedSourceFilename))
+                    {
+                        generatedSourceFilename = $"{classRecord!.Name}_ChunkyMonkey_{counter}.cs";
+                        counter++;
+                    }
+
+                    spc.AddSource(generatedSourceFilename, SourceText.From(generatedCode, Encoding.UTF8));
+                    usedFileNames.Add(generatedSourceFilename);
                 }
             });
-        }
-
-        /// <summary>
-        /// Checks if the property symbol represents a generic type with the specified type name.
-        /// </summary>
-        /// <param name="symbol">The property symbol to check.</param>
-        /// <param name="typeName">The type name to match.</param>
-        /// <returns>True if the property symbol represents a generic type with the specified type name, otherwise false.</returns>
-        private bool IsGenericType(IPropertySymbol symbol, string typeName)
-        {
-            if (symbol.Type is INamedTypeSymbol namedType && namedType.IsGenericType)
-            {
-                var from = namedType.ConstructedFrom.ToString();
-                return from == typeName;
-            }
-
-            return false;
-        }
+        }       
 
         /// <summary>
         /// Generates the chunking code for a class record.
@@ -81,68 +76,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
         {
             var className = classRecord.Name;
             var namespaceText = classRecord.Namespace ?? "Unknown_Namespace";
-            var sealedModifier = classRecord.IsSealed ? "sealed " : string.Empty;
-
-            var classChunkAttribute = GetAttributeForSymbol(AttributeFullTypeNames.Chunk, classRecord.ClassSymbol);
-
-            var typeRules = new List<TypeRecord>();
-            var chunkCodeFactory = new ChunkCodeFactory();
-            var mergeChunksCodeFactory = new MergePopertyValuesFromChunkFactory();
-            var preMergeChunksCodeFactory = new PreMergeChunksCodeFactory();
-            var postMergeChunksCodeFactory = new PostMergeChunksCodeFactory();
-
-            typeRules.AddRange(
-                [
-                    new TypeRecord(
-                        Name: "List",
-                        TypeMatcher: x => IsGenericType(x, "System.Collections.Generic.List<T>"),
-                        LengthPropertyName: "Count",
-                        ChunkCodeFactory: chunkCodeFactory.ForListProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForListProperty,
-                        PreMergeChunksCodeFactory: null,
-                        PostMergeChunksCodeFactory: null),
-                    new TypeRecord(
-                        Name: "Collection",
-                        TypeMatcher: x => IsGenericType(x, "System.Collections.ObjectModel.Collection<T>"),
-                        LengthPropertyName: "Count",
-                        ChunkCodeFactory: chunkCodeFactory.ForCollectionProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForCollectionProperty,
-                        PreMergeChunksCodeFactory: null,
-                        PostMergeChunksCodeFactory: null),
-                    new TypeRecord(
-                        Name: "Dictionary",
-                        TypeMatcher: x => IsGenericType(x, "System.Collections.Generic.Dictionary<TKey, TValue>"),
-                        LengthPropertyName: "Count",
-                        ChunkCodeFactory: chunkCodeFactory.ForDictionaryProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForDictionaryProperty,
-                        PreMergeChunksCodeFactory: null,
-                        PostMergeChunksCodeFactory: null),
-                    new TypeRecord(
-                        Name: "Array",
-                        TypeMatcher: x => x.Type.Kind == SymbolKind.ArrayType && x.GetMethod != null && x.SetMethod != null,
-                        LengthPropertyName: "Length",
-                        ChunkCodeFactory: chunkCodeFactory.ForArrayProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForArrayProperty,
-                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForArrayProperty,
-                        PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForArrayProperty),
-                    new TypeRecord(
-                        Name: "HashSet",
-                        TypeMatcher: x => IsGenericType(x, "System.Collections.Generic.HashSet<T>"),
-                        LengthPropertyName: "Count",
-                        ChunkCodeFactory: chunkCodeFactory.ForHashSetProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForHashSetProperty,
-                        PreMergeChunksCodeFactory: null,
-                        PostMergeChunksCodeFactory: null),
-                    new TypeRecord(
-                        Name: "SortedSet",
-                        TypeMatcher: x => IsGenericType(x, "System.Collections.Generic.SortedSet<T>"),
-                        LengthPropertyName: "Count",
-                        ChunkCodeFactory: chunkCodeFactory.ForSortedSetProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForSortedSetProperty,
-                        PreMergeChunksCodeFactory: null,
-                        PostMergeChunksCodeFactory: null),
-                ]
-             );
+            var sealedModifier = classRecord.IsSealed ? "sealed " : string.Empty;          
 
             var sb = new StringBuilder();
 
@@ -167,28 +101,16 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 
             sb.AppendLine($"            // Find the length of the biggest collection.");
 
-            var classProperties = classRecord.Properties
-                .Select(p =>
-                {
-                    var typeRule = typeRules.FirstOrDefault(r => r.TypeMatcher(p));
-                    var declarationType = p.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat.WithMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier | SymbolDisplayMiscellaneousOptions.UseSpecialTypes));
-                    var isArray = p.Type.Kind == SymbolKind.ArrayType;
-                    var chunkProperty = typeRule is not null
-                            && p.DeclaredAccessibility == Accessibility.Public &&
-                            (classChunkAttribute is not null || GetAttributeForSymbol(AttributeFullTypeNames.ChunkMember, p) is not null);
-                    var lastValueVariableName = "lastValue_" + p.Name;
-                    var temporaryListVariableNameForArrays = isArray ? "tempArrayList_" + p.Name : null;
-                    var arrayElementType = isArray ? ((IArrayTypeSymbol)p.Type).ElementType : null;
-                    return new PropertyRecord(p, typeRule, declarationType, isArray, arrayElementType, chunkProperty, lastValueVariableName, temporaryListVariableNameForArrays);
-                })
-                .ToArray();
+
+            var classPropertyEvaluator = new ClassPropertyEvaluator();
+            var classProperties = classPropertyEvaluator.GetProperties(classRecord);
 
             var chunkCollectionProperties = classProperties
-                .Where(x => x.ChunkProperty)
+                .Where(x => x.TypeRecord is not null)
                 .ToImmutableArray();
 
             var nonChunkedProperties = classProperties
-                .Where(x => !x.ChunkProperty)
+                .Where(x => x.TypeRecord is null)
                 .ToImmutableArray();
 
             if (chunkCollectionProperties.Any())
@@ -196,7 +118,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
                 sb.AppendLine($"            long biggestCollectionLength = new long[] {{");
                 foreach (var property in chunkCollectionProperties)
                 {
-                    sb.AppendLine($"                (this.{property.Symbol.Name} is not null) ? this.{property.Symbol.Name}.{property.TypeRule!.LengthPropertyName} : 0");
+                    sb.AppendLine($"                (this.{property.Symbol.Name} is not null) ? this.{property.Symbol.Name}.{property.TypeRecord!.LengthPropertyName} : 0");
                     if (property != chunkCollectionProperties.Last())
                     {
                         sb.Append(", ");
@@ -216,9 +138,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 
             foreach (var property in classProperties)
             {
-                if (property.ChunkProperty)
+                if (property.IsChunkable)
                 {
-                    var line = property.TypeRule!.ChunkCodeFactory(property);
+                    var line = property.TypeRecord!.ChunkCodeFactory(property);
                     sb.AppendLine(line);
                 }
                 else
@@ -254,9 +176,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 
             foreach (var property in classProperties)
             {
-                if (property.ChunkProperty && property.TypeRule?.PreMergeChunksCodeFactory is not null)
+                if (property.IsChunkable && property.TypeRecord?.PreMergeChunksCodeFactory is not null)
                 {
-                    var line = property.TypeRule.PreMergeChunksCodeFactory(property);
+                    var line = property.TypeRecord.PreMergeChunksCodeFactory(property);
                     sb.AppendLine(line);
                 }
             }
@@ -281,9 +203,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 
             foreach (var property in classProperties)
             {
-                if (property.ChunkProperty)
+                if (property.IsChunkable)
                 {
-                    var line = property.TypeRule!.MergePopertyValuesFromChunkFactory(property);
+                    var line = property.TypeRecord!.MergePopertyValuesFromChunkFactory(property);
                     sb.AppendLine(line);
                 }
                 else
@@ -301,9 +223,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             var postMergeAdded = false;
             foreach (var property in classProperties)
             {
-                if (property.ChunkProperty && property.TypeRule?.PostMergeChunksCodeFactory is not null)
+                if (property.IsChunkable && property.TypeRecord?.PostMergeChunksCodeFactory is not null)
                 {
-                    var line = property.TypeRule.PostMergeChunksCodeFactory(property);
+                    var line = property.TypeRecord.PostMergeChunksCodeFactory(property);
                     sb.AppendLine(line);
                     postMergeAdded = true;
                 }

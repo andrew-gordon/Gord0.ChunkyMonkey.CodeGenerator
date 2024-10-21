@@ -8,57 +8,48 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
     /// <summary>
     /// Represents a record for a class declaration.
     /// </summary>
-    public record ClassRecord(ClassDeclarationSyntax ClassDeclaration, INamedTypeSymbol ClassSymbol, bool RequiresChunking)
+    public record ClassRecord(INamedTypeSymbol ClassSymbol)
     {
-        /// <summary>
-        /// Gets the syntax node representing the class declaration.
-        /// </summary>
-        public ClassDeclarationSyntax ClassDeclaration { get; } = ClassDeclaration;
+        ///// <summary>
+        ///// Gets the syntax node representing the class declaration.
+        ///// </summary>
+        //public ClassDeclarationSyntax ClassDeclaration { get; } = ClassDeclaration;
 
         /// <summary>
         /// Gets the named type symbol representing the class.
         /// </summary>
         public INamedTypeSymbol ClassSymbol { get; } = ClassSymbol;
 
-        /// <summary>
-        /// Gets a value indicating whether the class requires chunking.
-        /// </summary>
-        public bool RequiresChunking { get; } = RequiresChunking;
+        ///// <summary>
+        ///// Gets a value indicating whether the class requires chunking.
+        ///// </summary>
+        //public bool RequiresChunking { get; } = RequiresChunking;
 
         /// <summary>
         /// Gets the name of the class.
         /// </summary>
-        public string Name => ClassDeclaration.Identifier.Text;
+        public string Name => ClassSymbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
 
         /// <summary>
         /// Gets the namespace of the class.
         /// </summary>
-        public string? Namespace => ClassDeclaration.GetNamespace();
+        public string? Namespace => ClassSymbol.ContainingNamespace?.ToDisplayString();
 
         /// <summary>
         /// Gets a value indicating whether the class is abstract.
         /// </summary>
-        public bool IsAbstract => ClassDeclaration.Modifiers.Any(SyntaxKind.AbstractKeyword);
+        public bool IsAbstract => ClassSymbol.TypeKind == TypeKind.Class && ClassSymbol.IsAbstract;
 
         /// <summary>
         /// Gets a value indicating whether the class is public.
         /// </summary>
-        public bool IsPublic => ClassDeclaration.Modifiers.Any(SyntaxKind.PublicKeyword);
+        public bool IsPublic => ClassSymbol.DeclaredAccessibility == Accessibility.Public;
 
         /// <summary>
         /// Gets a value indicating whether the class is sealed.
         /// </summary>
-        public bool IsSealed => ClassDeclaration.Modifiers.Any(SyntaxKind.SealedKeyword);
+        public bool IsSealed => ClassSymbol.TypeKind == TypeKind.Class && ClassSymbol.IsSealed;
 
-        /// <summary>
-        /// Gets a value indicating whether the class is static.
-        /// </summary>
-        public bool IsStatic => ClassDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword);
-
-        /// <summary>
-        /// Gets a value indicating whether the class is partial.
-        /// </summary>
-        public bool IsPartial => ClassDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword);
 
         /// <summary>
         /// Gets the property symbols of the class.

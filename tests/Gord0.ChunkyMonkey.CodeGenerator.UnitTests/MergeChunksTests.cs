@@ -1,5 +1,5 @@
 ﻿using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Helpers;
-using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.TestClasses;
+using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.TestClasses.WithChunkAttributeOnClass;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
 {
@@ -9,7 +9,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
         public void MergeChunks_ArrayProperty_ReturnsChunkedInstances()
         {
             // Arrange
-            var chunks = new List<ClassWithArrayProperty>
+            var chunks = new List<Chunk_ClassWithArrayProperty>
             {
                 new() {
                     Name = "John",
@@ -41,9 +41,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
             };
 
             // Act
-            var actual = ClassWithArrayProperty.MergeChunks(chunks);
+            var actual = Chunk_ClassWithArrayProperty.MergeChunks(chunks);
 
-            var expected = new ClassWithArrayProperty
+            var expected = new Chunk_ClassWithArrayProperty
             {
                 Name = "John",
                 Age = 25,
@@ -60,7 +60,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
         public void MergeChunks_NullableArrayProperty_ReturnsChunkedInstances()
         {
             // Arrange
-            var chunks = new List<ClassWithNullableArrayProperty>
+            var chunks = new List<Chunk_ClassWithNullableArrayProperty>
             {
                 new() {
                     Name = "John",
@@ -92,9 +92,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
             };
 
             // Act
-            var actual = ClassWithNullableArrayProperty.MergeChunks(chunks);
+            var actual = Chunk_ClassWithNullableArrayProperty.MergeChunks(chunks);
 
-            var expected = new ClassWithArrayProperty
+            var expected = new Chunk_ClassWithArrayProperty
             {
                 Name = "John",
                 Age = 25,
@@ -112,7 +112,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
         public void MergeChunks_MulitpleCollectionProperties_ReturnsChunkedInstances()
         {
             // Arrange
-            var chunks = new List<ClassWithMultipleCollectionProperties>
+            var chunks = new List<Chunk_ClassWithMultipleCollectionProperties>
             {
                 new() {
                     Name = "John",
@@ -170,9 +170,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
             };
 
             // Act
-            var actual = ClassWithMultipleCollectionProperties.MergeChunks(chunks);
+            var actual = Chunk_ClassWithMultipleCollectionProperties.MergeChunks(chunks);
 
-            var expected = new ClassWithMultipleCollectionProperties
+            var expected = new Chunk_ClassWithMultipleCollectionProperties
             {
                 Name = "John",
                 Age = 25,
@@ -192,10 +192,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
             // Assert
             Assert.Equal(expected.Name, actual.Name);
             Assert.Equal(expected.Age, actual.Age);
-            Assert.True(expected.FavouriteNumbers.SequenceEqual(actual.FavouriteNumbers));
-            Assert.True(expected.FavouriteFilms.SequenceEqual(actual.FavouriteFilms));
-            Assert.True(expected.LotteryNumbers.SequenceEqual(actual.LotteryNumbers));
-            Assert.True(DictionaryComparer.Compare(expected.Attributes, actual.Attributes));
+            Assert.True(expected.FavouriteNumbers.SequenceEqual(actual.FavouriteNumbers!));
+            Assert.True(expected.FavouriteFilms.SequenceEqual(actual.FavouriteFilms!));
+            Assert.True(expected.LotteryNumbers.SequenceEqual(actual.LotteryNumbers!));
+            Assert.True(DictionaryComparer.Compare(expected.Attributes, actual.Attributes!));
         }
     }
 }

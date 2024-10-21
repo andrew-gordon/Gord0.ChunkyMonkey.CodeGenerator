@@ -5,7 +5,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
     /// <summary>
     /// Represents a record for a property.
     /// </summary>
-    public class PropertyRecord(IPropertySymbol p, TypeRecord? typeRule, string declarationType, bool isArray, ITypeSymbol? arrayElementType, bool chunkProperty, string lastValueVariableName, string? temporaryListVariableNameForArrays)
+    public class PropertyRecord(IPropertySymbol p, TypeRecord? typeRule, string declarationType, bool isArray, bool isClassChunked, bool isMemberChunked, ITypeSymbol? arrayElementType, bool ignoreProperty, string lastValueVariableName, string? temporaryListVariableNameForArrays)
     {
 
         /// <summary>
@@ -16,7 +16,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         /// <summary>
         /// Gets or sets the type rule for the property.
         /// </summary>
-        public TypeRecord? TypeRule { get; } = typeRule;
+        public TypeRecord? TypeRecord { get; } = typeRule;
 
         /// <summary>
         /// Gets or sets the declaration type of the property.
@@ -24,9 +24,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         public string DeclarationType { get; } = declarationType;
 
         /// <summary>
-        /// Gets or sets a value indicating whether the property should be chunked.
+        /// Gets or sets a value indicating whether the property should be ignored.
         /// </summary>
-        public bool ChunkProperty { get; set; } = chunkProperty;
+        public bool IgnoreProperty { get; set; } = ignoreProperty;
 
         /// <summary>
         /// Gets or sets the variable name for the last value of the property.
@@ -39,6 +39,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         public string? TemporaryListVariableNameForArray { get; set; } = temporaryListVariableNameForArrays;
 
         public bool IsArray { get; } = isArray;
+        public bool IsClassChunked { get; } = isClassChunked;
+        public bool IsMemberChunked { get; } = isMemberChunked;
         public ITypeSymbol? ArrayElementType { get; } = arrayElementType;
+        public bool IsChunkable => TypeRecord != null;
     }
 }
