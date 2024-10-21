@@ -1,4 +1,5 @@
 ﻿using Gord0.ChunkyMonkey.CodeGenerator.Analyser;
+using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 

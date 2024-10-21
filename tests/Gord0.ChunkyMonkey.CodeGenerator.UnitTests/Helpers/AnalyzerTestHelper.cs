@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 
-namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
+namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Helpers
 {
     /// <summary>
     /// Helper class for analyzer tests.

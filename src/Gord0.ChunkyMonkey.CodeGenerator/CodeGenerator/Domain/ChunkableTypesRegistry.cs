@@ -37,6 +37,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForListProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
+
                     new TypeRecord(
                         Name: "Collection",
                         TypeMatcher: x => IsGenericType(x, "System.Collections.ObjectModel.Collection<T>"),
@@ -45,6 +46,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForCollectionProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
+
                     new TypeRecord(
                         Name: "Dictionary",
                         TypeMatcher: x => IsGenericType(x, "System.Collections.Generic.Dictionary<TKey, TValue>"),
@@ -53,6 +55,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForDictionaryProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
+
                     new TypeRecord(
                         Name: "Array",
                         TypeMatcher: x => x.Type.Kind == SymbolKind.ArrayType && x.GetMethod != null && x.SetMethod != null,
@@ -61,6 +64,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForArrayProperty,
                         PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForArrayProperty,
                         PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForArrayProperty),
+
                     new TypeRecord(
                         Name: "HashSet",
                         TypeMatcher: x => IsGenericType(x, "System.Collections.Generic.HashSet<T>"),
@@ -69,6 +73,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForHashSetProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
+
                     new TypeRecord(
                         Name: "SortedSet",
                         TypeMatcher: x => IsGenericType(x, "System.Collections.Generic.SortedSet<T>"),

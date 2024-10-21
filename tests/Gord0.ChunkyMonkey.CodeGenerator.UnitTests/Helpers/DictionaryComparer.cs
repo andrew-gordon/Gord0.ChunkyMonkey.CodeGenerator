@@ -3,7 +3,7 @@
     /// <summary>
     /// Helper class for comparing dictionaries.
     /// </summary>
-    public class DictionaryComparer
+    public static class DictionaryComparer
     {
         /// <summary>
         /// Compares two dictionaries for equality.
