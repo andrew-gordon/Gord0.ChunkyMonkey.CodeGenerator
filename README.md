@@ -13,8 +13,10 @@ ChunkyMonkey is a C# code generator that generates code, at build time, to split
 - `System.Collections.Generic.HashSet<T>`
 - `System.Collections.Generic.SortedSet<T>` 
 - `System.Collections.Immutable.ImmutableArray<T>`
+- `System.Collections.Immutable.ImmutableList<T>`
 - `System.Collections.ObjectModel.Collection<T>`
 - `System.Collections.ObjectModel.ReadOnlyCollection<T>`
+- `System.Collections.Specialized.StringCollection`
 
 ## Use Case
 
@@ -321,14 +323,11 @@ This generated method merges a set of chunks back into a single instance.
 - Support `System.Collections.Generic.Queue<T>`
 - Support `System.Collections.Generic.PriorityQueue<T>`
 - Support `System.Collections.Specialized.NameValueCollection`
-- Support `System.Collections.Specialized.StringCollection`
 - Support `System.Collections.Specialized.BitArray`
 - Support `System.Collections.Immutable.ImmutableList`
 - Support `System.Collections.Immutable.ImmutableHashSet`
 - Support `System.Collections.ObjectModel.ObservableCollection<T>`
 - Support `System.Collections.ObjectModel.ReadOnlyObservableCollection<TKey>`
-- Support `Span<T>`
-- Support `ReadOnlySpan<T>`
 - Support `Memory<T>`
 - Support `ReadOnlyMemory<T>`
 - Analyzer warning when `[Chunk]` is used on a class containing a property without a getter and setter.
@@ -354,3 +353,4 @@ This generated method merges a set of chunks back into a single instance.
 | 2.0.12  | Fixed code analyser rules: NoAccessibleChunkablePropertiesRule, NoChunkablePropertiesRule & NonSupportedChunkingTypeWithChunkMemberRule.<br>Parameterised NonSupportedChunkingTypeWithChunkMemberRule<br>PropertyRecord now has a GenericTypeArguments property<br>PropertyRecord.IsChunkable-> PropertyRecord.HasSupportedTypeForChunking<br>Support for `ImmutableArray<T>` |
 | 2.0.13  | Added support for `System.Collections.ObjectModel.ReadOnlyCollection<T>` |
 | 2.0.14  | Added support for `System.ArraySegment<T>` |
+| 2.0.15  | Added support for `System.Collections.Immutable.ImmutableList` & `System.Collections.Specialized.StringCollection` |

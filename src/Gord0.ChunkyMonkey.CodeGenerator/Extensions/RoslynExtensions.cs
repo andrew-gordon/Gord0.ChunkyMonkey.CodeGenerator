@@ -131,6 +131,23 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Extensions
 
             return false;
         }
+
+        /// <summary>
+        /// Checks if the property symbol represents a generic type with the specified type name.
+        /// </summary>
+        /// <param name="symbol">The property symbol to check.</param>
+        /// <param name="typeName">The type name to match.</param>
+        /// <returns>True if the property symbol represents a generic type with the specified type name, otherwise false.</returns>
+        public static bool IsType(this IPropertySymbol symbol, string typeName)
+        {
+            if (symbol.Type is INamedTypeSymbol namedType)
+            {
+                var from = namedType.ConstructedFrom.ToString();
+                return from == typeName;
+            }
+
+            return false;
+        }
     }
 }
 

@@ -91,6 +91,16 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForImmutableArrayProperty),
 
                     new TypeRecord(
+                        Name: "ImmutableList<T>",
+                        TypeMatcher: x => x.IsGenericType("System.Collections.Immutable.ImmutableList<T>") && x.GetMethod != null && x.SetMethod != null,
+                        LengthPropertyName: "Count",
+                        RequiresTemporaryListForMergingChunks: true,
+                        ChunkCodeFactory: chunkCodeFactory.ForImmutableListProperty,
+                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForImmutableListProperty,
+                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForImmutableListProperty,
+                        PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForImmutableListProperty),
+
+                    new TypeRecord(
                         Name: "HashSet<T>",
                         TypeMatcher: x => x.IsGenericType("System.Collections.Generic.HashSet<T>") && x.GetMethod != null && x.SetMethod != null,
                         LengthPropertyName: "Count",
@@ -117,7 +127,17 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForArraySegmentProperty,
                         PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForArraySegmentProperty,
                         PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForArraySegmentProperty),
-                ]);
+
+                    new TypeRecord(
+                        Name: "StringCollection",
+                        TypeMatcher: x => x.IsType("System.Collections.Specialized.StringCollection") && x.GetMethod != null && x.SetMethod != null,
+                        LengthPropertyName: "Count",
+                        RequiresTemporaryListForMergingChunks: false,
+                        ChunkCodeFactory: chunkCodeFactory.ForStringCollectionProperty,
+                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForStringCollectionProperty,
+                        PreMergeChunksCodeFactory: null,
+                        PostMergeChunksCodeFactory: null),
+                ]);;
 
                 typeRecords = new ReadOnlyCollection<TypeRecord>(list);
             }

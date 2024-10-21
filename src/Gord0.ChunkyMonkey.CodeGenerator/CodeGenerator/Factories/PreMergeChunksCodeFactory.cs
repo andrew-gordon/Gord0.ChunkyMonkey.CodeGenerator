@@ -34,6 +34,14 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             return sb.ToString();
         }
 
+        internal string ForImmutableListProperty(PropertyRecord propertyRecord)
+        {
+            var typeArg = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var sb = new StringBuilder();
+            sb.AppendLine($"            List<{typeArg}>? {propertyRecord.TemporaryListVariableNameForArray} = null;");
+            return sb.ToString();
+        }
+
         internal string ForReadOnlyCollectionProperty(PropertyRecord propertyRecord)
         {
             var typeArg = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);

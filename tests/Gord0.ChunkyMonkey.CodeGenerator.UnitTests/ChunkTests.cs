@@ -1,5 +1,7 @@
 ﻿using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Helpers;
 using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.TestClasses.WithChunkAttributeOnClass;
+using System.Collections.Specialized;
+using Gord0.ChunkyMonkey.CodeGenerator.Extensions;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
 {
@@ -87,6 +89,49 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
         }
 
         [Fact]
+        public void Chunk_ImmutableListProperty_ReturnsChunkedInstances()
+        {
+            // Arrange
+            var instance = new Chunk_ClassWithImmutableListProperty
+            {
+                Name = "John",
+                Age = 25,
+                Numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            };
+            int chunkSize = 3;
+
+
+            // Act
+            var result = instance.Chunk(chunkSize).ToList();
+
+            // Assert
+            Assert.Equal(4, result.Count);
+
+            Assert.Equal(instance.Name, result[0].Name);
+            Assert.Equal(instance.Age, result[0].Age);
+            int[] expectedNumbers = [1, 2, 3];
+            Assert.True(expectedNumbers.SequenceEqual([.. result[0].Numbers!]));
+
+            Assert.Equal(instance.Name, result[1].Name);
+            Assert.Equal(instance.Age, result[1].Age);
+            expectedNumbers = [4, 5, 6];
+            Assert.True(expectedNumbers.SequenceEqual([.. result[1].Numbers!]));
+
+            Assert.Equal(instance.Name, result[2].Name);
+            Assert.Equal(instance.Age, result[2].Age);
+            expectedNumbers = [7, 8, 9];
+            Assert.True(expectedNumbers.SequenceEqual([.. result[2].Numbers!]));
+
+            Assert.Equal(instance.Name, result[3].Name);
+            Assert.Equal(instance.Age, result[3].Age);
+            expectedNumbers = [10];
+            Assert.True(expectedNumbers.SequenceEqual([.. result[3].Numbers!]));
+
+            Assert.Single(result.Select(x => x.Name).Distinct());
+            Assert.Single(result.Select(x => x.Age).Distinct());
+        }
+
+        [Fact]
         public void Chunk_ImmutableArrayProperty_ReturnsChunkedInstances()
         {
             // Arrange
@@ -167,6 +212,49 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
             Assert.Equal(instance.Age, result[3].Age);
             expectedNumbers = [10];
             Assert.True(expectedNumbers.SequenceEqual(result[3].Numbers));
+
+            Assert.Single(result.Select(x => x.Name).Distinct());
+            Assert.Single(result.Select(x => x.Age).Distinct());
+        }
+
+        [Fact]
+        public void Chunk_StringCollectionProperty_ReturnsChunkedInstances()
+        {
+            string[] films = ["Reservoir Dogs", "Pulp Fiction", "Inception", "The Matrix", "The Shawshank Redemption", "The Godfather", "The Dark Knight", "Fight Club"];
+            var sc = new StringCollection();
+            sc.AddRange(films);
+
+            // Arrange
+            var instance = new Chunk_ClassWithStringCollectionProperty
+            {
+                Name = "John",
+                Age = 25,
+                FavouriteFilms = sc,
+            };
+
+            int chunkSize = 3;
+
+
+            // Act
+            var result = instance.Chunk(chunkSize).ToList();
+
+            // Assert
+            Assert.Equal(3, result.Count);
+
+            Assert.Equal(instance.Name, result[0].Name);
+            Assert.Equal(instance.Age, result[0].Age);
+            string[] expectedFilms1 = ["Reservoir Dogs", "Pulp Fiction", "Inception"];
+            Assert.True(expectedFilms1.SequenceEqual(result[0].FavouriteFilms!.ToEnumerable()));
+
+            Assert.Equal(instance.Name, result[1].Name);
+            Assert.Equal(instance.Age, result[1].Age);
+            string[] expectedFilms2 = ["The Matrix", "The Shawshank Redemption", "The Godfather"];
+            Assert.True(expectedFilms2.SequenceEqual(result[1].FavouriteFilms!.ToEnumerable()));
+
+            Assert.Equal(instance.Name, result[2].Name);
+            Assert.Equal(instance.Age, result[2].Age);
+            string[] expectedFilms3 = ["The Dark Knight", "Fight Club"];
+            Assert.True(expectedFilms3.SequenceEqual(result[2].FavouriteFilms!.ToEnumerable()));
 
             Assert.Single(result.Select(x => x.Name).Distinct());
             Assert.Single(result.Select(x => x.Age).Distinct());

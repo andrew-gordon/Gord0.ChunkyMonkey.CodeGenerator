@@ -84,7 +84,8 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
                 "System.Collections.Generic",
                 "System.Collections.Immutable",
                 "System.Collections.ObjectModel",
-                "System.Linq"
+                "System.Linq",
+                "System.Collections.Specialized"
             };
 
             foreach(var @using in usings)
