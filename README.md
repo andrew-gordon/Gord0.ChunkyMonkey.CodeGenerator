@@ -11,6 +11,7 @@ ChunkyMonkey is a C# code generator that generates code, at build time, to split
 - `System.Collections.Generic.Dictionary<K,V>` 
 - `System.Collections.Generic.List<T>`
 - `System.Collections.Generic.HashSet<T>`
+- `System.Collections.Generic.SortedList<TKey, TValue>`
 - `System.Collections.Generic.SortedSet<T>` 
 - `System.Collections.Immutable.ImmutableArray<T>`
 - `System.Collections.Immutable.ImmutableList<T>`
