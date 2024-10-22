@@ -360,3 +360,4 @@ This generated method merges a set of chunks back into a single instance.
 | 2.0.20  | README update in Future Enhancements section |
 | 2.0.21  | Added support for `System.Collections.Immutable.ImmutableHashSet` |
 | 2.0.22  | Added support for `System.Collections.ObjectModel.ObservableCollection<T>` |
+| 2.0.23  | Added support for `System.Collections.ObjectModel.ReadOnlyObservableCollection<TKey>` |
