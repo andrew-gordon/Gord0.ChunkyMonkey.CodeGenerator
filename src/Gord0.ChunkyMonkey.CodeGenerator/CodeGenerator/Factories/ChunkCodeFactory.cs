@@ -1,5 +1,6 @@
 ﻿using Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain;
 using Microsoft.CodeAnalysis;
+using System.Collections.Specialized;
 using System.Text;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
@@ -195,6 +196,30 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                            sortedList.Add(kvp.Key, kvp.Value);");
             sb.AppendLine($"                        }}");
             sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = sortedList;");
+            sb.AppendLine($"                    }}");
+            sb.AppendLine($"                }}");
+            return sb.ToString();
+        }
+
+        internal string ForNameValueCollectionProperty(PropertyRecord propertyRecord)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    var nameValueCollection = new {propertyRecord.Symbol.Type.Name}();");
+            sb.AppendLine($"");
+            sb.AppendLine($"                    if (this.{propertyRecord.Symbol.Name} is not null)");
+            sb.AppendLine($"                    {{");
+
+            // Use deferred execution for large NameValueCollection instances
+            sb.AppendLine($"                        var keyValuePairs = (this.{propertyRecord.Symbol.Name}.{propertyRecord.TypeRecord!.LengthPropertyName} > 20000)");
+            sb.AppendLine($"                            ? this.{propertyRecord.Symbol.Name}.AllKeys.SelectMany(key => this.{propertyRecord.Symbol.Name}.GetValues(key).Select(value => new {{ Key = key, Value = value }}))");
+            sb.AppendLine($"                            : this.{propertyRecord.Symbol.Name}.AllKeys.SelectMany(key => this.{propertyRecord.Symbol.Name}.GetValues(key).Select(value => new {{ Key = key, Value = value }})).ToArray();");
+            sb.AppendLine($"                        var chunkPairs = keyValuePairs.Skip(i).Take(chunkSize);");
+            sb.AppendLine($"                        foreach(var kvp in chunkPairs)");
+            sb.AppendLine($"                        {{");
+            sb.AppendLine($"                            nameValueCollection.Add(kvp.Key, kvp.Value);");
+            sb.AppendLine($"                        }}");
+            sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = nameValueCollection;");
             sb.AppendLine($"                    }}");
             sb.AppendLine($"                }}");
             return sb.ToString();

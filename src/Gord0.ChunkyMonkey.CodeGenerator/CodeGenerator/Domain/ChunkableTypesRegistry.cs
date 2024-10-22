@@ -143,7 +143,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         Name: "SortedList<TKey, TValue>",
                         TypeMatcher: x => x.IsGenericType("System.Collections.Generic.SortedList<TKey, TValue>") && x.GetMethod != null && x.SetMethod != null,
                         LengthPropertyName: "Count",
-                        RequiresTemporaryListForMergingChunks: true,
+                        RequiresTemporaryListForMergingChunks: false,
                         ChunkCodeFactory: chunkCodeFactory.ForSortedListProperty,
                         MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForSortedListProperty,
                         PreMergeChunksCodeFactory: null,
@@ -153,12 +153,22 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         Name: "SortedDictionary<TKey, TValue>",
                         TypeMatcher: x => x.IsGenericType("System.Collections.Generic.SortedDictionary<TKey, TValue>") && x.GetMethod != null && x.SetMethod != null,
                         LengthPropertyName: "Count",
-                        RequiresTemporaryListForMergingChunks: true,
+                        RequiresTemporaryListForMergingChunks: false,
                         ChunkCodeFactory: chunkCodeFactory.ForSortedDictionaryProperty,
                         MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForSortedDictionaryProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
 
+                    new TypeRecord(
+                        Name: "System.Collections.Specialized.NameValueCollection",
+                        TypeMatcher: x => x.IsType("System.Collections.Specialized.NameValueCollection") && x.GetMethod != null && x.SetMethod != null,
+                        LengthPropertyName: "Count",
+                        RequiresTemporaryListForMergingChunks: false,
+                        ChunkCodeFactory: chunkCodeFactory.ForNameValueCollectionProperty,
+                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForNameValueCollectionProperty,
+                        PreMergeChunksCodeFactory: null,
+                        PostMergeChunksCodeFactory: null),
+                        
                 ]);
 
                 typeRecords = new ReadOnlyCollection<TypeRecord>(list);

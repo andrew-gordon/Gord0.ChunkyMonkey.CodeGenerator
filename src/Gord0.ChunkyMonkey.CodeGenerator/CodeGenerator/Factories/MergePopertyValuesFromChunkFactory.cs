@@ -233,5 +233,24 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                }}");
             return sb.ToString();
         }
+
+        internal string ForNameValueCollectionProperty(PropertyRecord propertyRecord)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"                    if (instance.{propertyRecord.Symbol.Name} is null)");
+            sb.AppendLine($"                    {{");
+            sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = new {propertyRecord.Symbol.Type.Name}();");
+            sb.AppendLine($"                    }}");
+            sb.AppendLine($"");
+            sb.AppendLine($"                    if (chunk.{propertyRecord.Symbol.Name} is not null)");
+            sb.AppendLine($"                    {{");
+            sb.AppendLine($"                        var keyValuePairs = chunk.{propertyRecord.Symbol.Name}.AllKeys.SelectMany(key => (instance.{propertyRecord.Symbol.Name}.GetValues(key) ?? []).Select(value => new {{ Key = key, Value = value }})).ToArray();");
+            sb.AppendLine($"                        foreach(var kvp in keyValuePairs)");
+            sb.AppendLine($"                        {{");
+            sb.AppendLine($"                            instance.{propertyRecord.Symbol.Name}.Add(kvp.Key, kvp.Value);");
+            sb.AppendLine($"                        }}");
+            sb.AppendLine($"                    }}");
+            return sb.ToString();
+        }
     }
 }

@@ -182,7 +182,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
             {
                 Name = "John",
                 Age = 25,
-                Numbers = new System.Collections.ObjectModel.ReadOnlyCollection<int>( [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+                Numbers = new System.Collections.ObjectModel.ReadOnlyCollection<int>([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
             };
             int chunkSize = 3;
 
@@ -582,7 +582,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
         }
 
         [Fact]
-        public void ChunkSorteDictionaryProperty_ReturnsChunkedInstances()
+        public void ChunkSortedDictionaryProperty_ReturnsChunkedInstances()
         {
             var sortedDictionary = new SortedDictionary<string, int>
             {
@@ -644,6 +644,59 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
             Assert.Equal(expected2, result[1].Numbers);
             Assert.Equal(expected3, result[2].Numbers);
             Assert.Equal(expected4, result[3].Numbers);
+        }
+
+        [Fact]
+        public void ChunkNameValueCollectionProperty_ReturnsChunkedInstances()
+        {
+            // Arrange
+            var instance = new Chunk_ClassWithNameValueCollectionProperty
+            {
+                Values = new NameValueCollection
+                {
+                    { "One", "Un"},
+                    { "Two", "Deux"},
+                    { "Three", "Trois"},
+                    { "Four", "Quatre"},
+                    { "Five", "Cinq"},
+                    { "Six", "Six"},
+                    { "Seven", "Sept"},
+                    { "Eight", "Huit"},
+                    { "Nine", "Neuf"},
+                    { "Ten", "Dix" }
+                }
+            };
+
+            int chunkSize = 6;
+
+            // Act
+            var result = instance.Chunk(chunkSize).ToList();
+
+            // Assert
+            Assert.Equal(2, result.Count);
+
+            // NB: The keys are sorted so will appear in alphabetical order
+
+            var expected1 = new NameValueCollection
+            {
+                { "One", "Un"},
+                { "Two", "Deux"},
+                { "Three", "Trois"},
+                { "Four", "Quatre"},
+                { "Five", "Cinq"},
+                { "Six", "Six"},
+            };
+
+            var expected2 = new NameValueCollection
+            {
+                { "Seven", "Sept"},
+                { "Eight", "Huit"},
+                { "Nine", "Neuf"},
+                { "Ten", "Dix" }
+            };
+
+            Assert.Equal(expected1, result[0].Values);
+            Assert.Equal(expected2, result[1].Values);
         }
     }
 }

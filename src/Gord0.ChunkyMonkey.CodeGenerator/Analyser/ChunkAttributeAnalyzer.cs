@@ -96,7 +96,6 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
 
             var properties = classPropertyEvaluator.GetProperties(classRecord, removeIgnoredProperties: false);
 
-
             var chunkableMembers = properties.Where(p => p.HasSupportedTypeForChunking).Count();
             var accessibleChunkableMembers = properties.Where(p => p.HasSupportedTypeForChunking && p.AccessibilityRequirementFulfilled).Count();
             var inaccessibleChunkableMembers = properties.Where(p => p.HasSupportedTypeForChunking && !p.AccessibilityRequirementFulfilled).Count();
