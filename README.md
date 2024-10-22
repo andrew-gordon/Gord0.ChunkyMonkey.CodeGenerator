@@ -330,8 +330,8 @@ This generated method merges a set of chunks back into a single instance.
 - Support `System.Collections.ObjectModel.ReadOnlyObservableCollection<TKey>`
 - Support `Memory<T>`
 - Support `ReadOnlyMemory<T>`
-- Analyzer warning when `[Chunk]` is used on a class containing a property without a getter and setter.
-- Analyzer warning when `[ChunkMember]` is applied to a property without a getter and setter.
+- Analyzer warning when `[Chunk]` is used on a class containing a collection property without a getter and setter.
+- Analyzer warning when `[ChunkMember]` is applied to a collection property without a getter and setter.
 
 ## Versions
 
@@ -358,3 +358,4 @@ This generated method merges a set of chunks back into a single instance.
 | 2.0.17  | Updated README to reflect addition of support for `System.Collections.Generic.SortedSet<T>` |
 | 2.0.18  | Added support for `System.Collections.Generic.SortedDictionary<TKey, TValue>` |
 | 2.0.19  | Added support for `System.Collections.Specialized.NameValueCollection` |
+| 2.0.20  | README update in Future Enhancements section |
