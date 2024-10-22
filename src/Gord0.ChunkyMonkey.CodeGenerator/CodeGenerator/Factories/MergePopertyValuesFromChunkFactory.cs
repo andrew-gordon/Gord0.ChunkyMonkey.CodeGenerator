@@ -252,5 +252,21 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                    }}");
             return sb.ToString();
         }
+
+        internal string ForImmutableHashSetProperty(PropertyRecord propertyRecord)
+        {
+            var genericType = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var sb = new StringBuilder();
+            sb.AppendLine($"                if (chunk.{propertyRecord.Symbol.Name} is not null)");
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    if ({propertyRecord.TemporaryListVariableNameForArray} is null)");
+            sb.AppendLine($"                    {{");
+            sb.AppendLine($"                        {propertyRecord.TemporaryListVariableNameForArray} = [];");
+            sb.AppendLine($"                    }}");
+            sb.AppendLine($"");
+            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableNameForArray}.AddRange(chunk.{propertyRecord.Symbol.Name});");
+            sb.AppendLine($"                }}");
+            return sb.ToString();
+        }
     }
 }

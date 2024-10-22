@@ -15,12 +15,12 @@ ChunkyMonkey is a C# code generator that generates code, at build time, to split
 - `System.Collections.Generic.SortedList<TKey, TValue>`
 - `System.Collections.Generic.SortedSet<T>` 
 - `System.Collections.Immutable.ImmutableArray<T>`
+- `System.Collections.Immutable.ImmutableHashSet`
 - `System.Collections.Immutable.ImmutableList<T>`
 - `System.Collections.ObjectModel.Collection<T>`
 - `System.Collections.ObjectModel.ReadOnlyCollection<T>`
 - `System.Collections.Specialized.NameValueCollection`
 - `System.Collections.Specialized.StringCollection`
-
 ## Use Case
 
 * You need to break down a large API request into smaller pieces (chunks) - to avoid breaking the maximum request body size limit of your web server.
@@ -324,8 +324,6 @@ This generated method merges a set of chunks back into a single instance.
 - Support `System.Collections.Generic.Queue<T>`
 - Support `System.Collections.Generic.PriorityQueue<T>`
 - Support `System.Collections.Specialized.BitArray`
-- Support `System.Collections.Immutable.ImmutableList`
-- Support `System.Collections.Immutable.ImmutableHashSet`
 - Support `System.Collections.ObjectModel.ObservableCollection<T>`
 - Support `System.Collections.ObjectModel.ReadOnlyObservableCollection<TKey>`
 - Support `Memory<T>`
@@ -359,3 +357,4 @@ This generated method merges a set of chunks back into a single instance.
 | 2.0.18  | Added support for `System.Collections.Generic.SortedDictionary<TKey, TValue>` |
 | 2.0.19  | Added support for `System.Collections.Specialized.NameValueCollection` |
 | 2.0.20  | README update in Future Enhancements section |
+| 2.0.21  | Added support for `System.Collections.Immutable.ImmutableHashSet` |

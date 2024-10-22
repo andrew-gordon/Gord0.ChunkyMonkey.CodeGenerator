@@ -153,6 +153,50 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
         }
 
         [Fact]
+        public void MergeChunks_ImmutableHashSetProperty_ReturnsChunkedInstances()
+        {
+            // Arrange
+            var chunks = new List<Chunk_ClassWithImmutableHashSetProperty>
+            {
+                new() {
+                    Name = "John",
+                    Age = 25,
+                    Numbers = [1, 2, 3]
+                },
+                new() {
+                    Name = "John",
+                    Age = 25,
+                    Numbers = [4, 5, 6]
+                },
+                new() {
+                    Name = "John",
+                    Age = 25,
+                    Numbers = [7, 8, 9]
+                },
+                new() {
+                    Name = "John",
+                    Age = 25,
+                    Numbers = [10]
+                },
+            };
+
+            // Act
+            var actual = Chunk_ClassWithImmutableHashSetProperty.MergeChunks(chunks);
+
+            var expected = new Chunk_ClassWithImmutableHashSetProperty
+            {
+                Name = "John",
+                Age = 25,
+                Numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            };
+
+            // Assert
+            Assert.Equal(expected.Name, actual.Name);
+            Assert.Equal(expected.Age, actual.Age);
+            Assert.True(expected.Numbers.SequenceEqual(actual.Numbers!));
+        }
+
+        [Fact]
         public void MergeChunks_ReadOnlyCollectionProperty_ReturnsChunkedInstances()
         {
             // Arrange

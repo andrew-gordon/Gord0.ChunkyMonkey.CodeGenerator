@@ -49,6 +49,13 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             return sb.ToString();
         }
 
+        internal string ForImmutableHashSetProperty(PropertyRecord propertyRecord)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"            instance.{propertyRecord.Symbol.Name} = ({propertyRecord.TemporaryListVariableNameForArray} ?? []).ToImmutableHashSet();");
+            return sb.ToString();
+        }
+
         internal string ForImmutableListProperty(PropertyRecord propertyRecord)
         {
             var sb = new StringBuilder();

@@ -168,7 +168,16 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForNameValueCollectionProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
-                        
+
+                    new TypeRecord(
+                        Name: "ImmutableHashSet<T>",
+                        TypeMatcher: x => x.IsGenericType("System.Collections.Immutable.ImmutableHashSet<T>") && x.GetMethod != null && x.SetMethod != null,
+                        LengthPropertyName: "Count",
+                        RequiresTemporaryListForMergingChunks: true,
+                        ChunkCodeFactory: chunkCodeFactory.ForImmutableHashSetProperty,
+                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForImmutableHashSetProperty,
+                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForImmutableHashSetProperty,
+                        PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForImmutableHashSetProperty),
                 ]);
 
                 typeRecords = new ReadOnlyCollection<TypeRecord>(list);
