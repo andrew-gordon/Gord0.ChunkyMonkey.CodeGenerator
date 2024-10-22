@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Text;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
@@ -129,7 +128,8 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 
 
             var classPropertyEvaluator = new ClassPropertyEvaluator();
-            var classProperties = classPropertyEvaluator.GetProperties(classRecord);
+            var classProperties = classPropertyEvaluator.GetProperties(classRecord)
+                .Where(p => p.HasGetter && p.HasSetter);
 
             var chunkCollectionProperties = classProperties
                 .Where(x => x.TypeRecord is not null)

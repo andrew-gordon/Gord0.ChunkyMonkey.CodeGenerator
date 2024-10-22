@@ -12,4 +12,6 @@ CMKY0005| Usage    | Error    | Do not not specify ChunkAttribute on a class at 
 CMKY0006| Usage    | Error    | ChunkMemberAtribute cannot be applied to an abstract member
 CMKY0007| Usage    | Error    | ChunkMemberAtribute cannot be applied to a static member
 CMKY0008| Usage    | Error    | ChunkMemberAtribute cannot be applied to a member with a type that ChunkyMonkey cannot chunk. See https://github.com/andrew-gordon/Gord0.ChunkyMonkey.CodeGenerator for a list of supported types.
-CMKY0009| Usage    | Warning    | ChunkAttribute should only be applied to a class with at least one chunkable collection property that meets the member accessibility criteria
+CMKY0009| Usage    | Warning  | ChunkAttribute should only be applied to a class with at least one chunkable collection property that meets the member accessibility criteria
+CMKY0010| Usage    | Error    | Invalid use of ChunkMemberAttribute on a property without a getter
+CMKY0011| Usage    | Error    | Invalid use of ChunkMemberAttribute on a property without a setter

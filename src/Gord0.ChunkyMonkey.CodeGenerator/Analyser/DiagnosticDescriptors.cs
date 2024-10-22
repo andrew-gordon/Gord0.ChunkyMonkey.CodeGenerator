@@ -101,9 +101,32 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
         public static readonly DiagnosticDescriptor NoAccessibleChunkablePropertiesRule = new(
             "CMKY0009",
             "Invalid use of ChunkAttribute on class without a chunkable collection property that meets the member accessibility criteria",
-            "ChunkAttribute should only be applied to a class with at least one chunkable collection property that meets the member accessibility criteria",
+            "ChunkAttribute must only be applied to a class with at least one chunkable collection property that meets the member accessibility criteria",
             "Usage",
             DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
+
+        /// <summary>
+        /// Represents the diagnostic descriptor for the rule that warns about applying ChunkMemberAttribute to a property without a getter.
+        /// </summary>
+        public static readonly DiagnosticDescriptor NoGetterOnPropertyDecoratedWithChunkMemberAttributeRule = new(
+            "CMKY0010",
+            "Invalid use of ChunkMemberAttribute on a property without a getter",
+            "ChunkAttribute must only be applied to a property with a getter",
+            "Usage",
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
+        /// <summary>
+        /// Represents the diagnostic descriptor for the rule that warns about applying ChunkMemberAttribute to a property without a setter.
+        /// </summary>
+        public static readonly DiagnosticDescriptor NoSetterOnPropertyDecoratedWithChunkMemberAttributeRule = new(
+            "CMKY0011",
+            "Invalid use of ChunkMemberAttribute on a property without a setter",
+            "ChunkAttribute must only be applied to a property with a setter",
+            "Usage",
+            DiagnosticSeverity.Error,
+            isEnabledByDefault: true);
+
     }
 }

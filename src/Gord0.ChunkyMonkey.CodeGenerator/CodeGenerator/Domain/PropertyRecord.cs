@@ -20,7 +20,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         ITypeSymbol? standardArrayElementType,
         bool ignoreProperty,
         string lastValueVariableName,
-        string? temporaryListVariableName)
+        string? temporaryListVariableName,
+        bool hasGetter,
+        bool hasSetter)
     {
         private static readonly SymbolDisplayFormat typeNameOnlyFormat = new(
                 typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly,
@@ -45,9 +47,22 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         public bool IsValueType { get; } = isValueType;
 
         /// <summary>
+        /// Gets a value indicating whether the property has a getter.
+        /// </summary>
+        /// <value><c>true</c> if the property has a getter; otherwise, <c>false</c>.</value>
+        public bool HasGetter { get; } = hasGetter;
+
+        /// <summary>
+        /// Gets a value indicating whether the property has a setter.
+        /// </summary>
+        /// <value><c>true</c> if the property has a setter; otherwise, <c>false</c>.</value>
+        public bool HasSetter { get; } = hasSetter;
+
+        /// <summary>
         /// Gets or sets the declaration type of the property.
         /// </summary>
         /// <value>The declaration type of the property.</value>
+        /// 
         public string DeclarationType { get; } = declarationType;
 
         /// <summary>

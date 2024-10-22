@@ -59,7 +59,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Analyzers
 
             test.ExpectedDiagnostics.Add(
                 new DiagnosticResult(DiagnosticDescriptors.NoAccessibleChunkablePropertiesRule.Id, DiagnosticSeverity.Warning)
-                    .WithMessage("ChunkAttribute should only be applied to a class with at least one chunkable collection property that meets the member accessibility criteria")
+                    .WithMessage("ChunkAttribute must only be applied to a class with at least one chunkable collection property that meets the member accessibility criteria")
                     .WithSpan(5, 29, 5, 77));
 
             await test.RunAsync();

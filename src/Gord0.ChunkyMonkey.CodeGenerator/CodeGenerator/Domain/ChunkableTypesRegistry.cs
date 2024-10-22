@@ -36,7 +36,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                     [
                         new TypeRecord(
                         Name: "List<T>",
-                        TypeMatcher: x => x.IsGenericType("System.Collections.Generic.List<T>") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsGenericType("System.Collections.Generic.List<T>"),
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForListProperty,
                         MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForListProperty,
@@ -45,7 +45,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "Collection<T>",
-                        TypeMatcher: x => x.IsGenericType("System.Collections.ObjectModel.Collection<T>") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsGenericType("System.Collections.ObjectModel.Collection<T>"),
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForCollectionProperty,
                         MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForCollectionProperty,
@@ -54,7 +54,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "Dictionary<K,V>",
-                        TypeMatcher: x => x.IsGenericType("System.Collections.Generic.Dictionary<TKey, TValue>") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsGenericType("System.Collections.Generic.Dictionary<TKey, TValue>"),
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForDictionaryProperty,
                         MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForDictionaryProperty,
@@ -63,7 +63,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "Array",
-                        TypeMatcher:x => x.Type.Kind == SymbolKind.ArrayType && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher:x => x.Type.Kind == SymbolKind.ArrayType,
                         LengthPropertyName: "Length",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForArrayProperty,
@@ -73,7 +73,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "ReadOnlyCollection<T>",
-                        TypeMatcher: x => x.IsGenericType("System.Collections.ObjectModel.ReadOnlyCollection<T>") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsGenericType("System.Collections.ObjectModel.ReadOnlyCollection<T>"),
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForReadOnlyCollectionProperty,
@@ -83,7 +83,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "ImmutableArray<T>",
-                        TypeMatcher: x => x.IsGenericType("System.Collections.Immutable.ImmutableArray<T>") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsGenericType("System.Collections.Immutable.ImmutableArray<T>"),
                         LengthPropertyName: "Length",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForImmutableArrayProperty,
@@ -93,7 +93,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "ImmutableList<T>",
-                        TypeMatcher: x => x.IsGenericType("System.Collections.Immutable.ImmutableList<T>") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsGenericType("System.Collections.Immutable.ImmutableList<T>"),
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForImmutableListProperty,
@@ -103,7 +103,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "HashSet<T>",
-                        TypeMatcher: x => x.IsGenericType("System.Collections.Generic.HashSet<T>") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsGenericType("System.Collections.Generic.HashSet<T>"),
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForHashSetProperty,
                         MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForHashSetProperty,
@@ -112,7 +112,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "SortedSet<T>",
-                        TypeMatcher: x => x.IsGenericType("System.Collections.Generic.SortedSet<T>") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsGenericType("System.Collections.Generic.SortedSet<T>"),
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForSortedSetProperty,
                         MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForSortedSetProperty,
@@ -121,7 +121,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "ArraySegment<T>",
-                        TypeMatcher: x => x.IsGenericType("System.ArraySegment<T>") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsGenericType("System.ArraySegment<T>"),
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForArraySegmentProperty,
@@ -131,7 +131,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "StringCollection",
-                        TypeMatcher: x => x.IsType("System.Collections.Specialized.StringCollection") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsType("System.Collections.Specialized.StringCollection"),
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: false,
                         ChunkCodeFactory: chunkCodeFactory.ForStringCollectionProperty,
@@ -141,7 +141,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "SortedList<TKey, TValue>",
-                        TypeMatcher: x => x.IsGenericType("System.Collections.Generic.SortedList<TKey, TValue>") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsGenericType("System.Collections.Generic.SortedList<TKey, TValue>"),
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: false,
                         ChunkCodeFactory: chunkCodeFactory.ForSortedListProperty,
@@ -151,7 +151,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "SortedDictionary<TKey, TValue>",
-                        TypeMatcher: x => x.IsGenericType("System.Collections.Generic.SortedDictionary<TKey, TValue>") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsGenericType("System.Collections.Generic.SortedDictionary<TKey, TValue>"),
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: false,
                         ChunkCodeFactory: chunkCodeFactory.ForSortedDictionaryProperty,
@@ -161,7 +161,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "System.Collections.Specialized.NameValueCollection",
-                        TypeMatcher: x => x.IsType("System.Collections.Specialized.NameValueCollection") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsType("System.Collections.Specialized.NameValueCollection"),
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: false,
                         ChunkCodeFactory: chunkCodeFactory.ForNameValueCollectionProperty,
@@ -171,7 +171,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "ImmutableHashSet<T>",
-                        TypeMatcher: x => x.IsGenericType("System.Collections.Immutable.ImmutableHashSet<T>") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsGenericType("System.Collections.Immutable.ImmutableHashSet<T>"),
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForImmutableHashSetProperty,
@@ -181,7 +181,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "System.Collections.ObjectModel.ObservableCollection<T>",
-                        TypeMatcher: x => x.IsGenericType("System.Collections.ObjectModel.ObservableCollection<T>") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsGenericType("System.Collections.ObjectModel.ObservableCollection<T>"),
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForObservableCollectionProperty,
@@ -191,7 +191,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     new TypeRecord(
                         Name: "System.Collections.ObjectModel.ReadOnlyObservableCollection<T>",
-                        TypeMatcher: x => x.IsGenericType("System.Collections.ObjectModel.ReadOnlyObservableCollection<T>") && x.GetMethod != null && x.SetMethod != null,
+                        TypeMatcher: x => x.IsGenericType("System.Collections.ObjectModel.ReadOnlyObservableCollection<T>"),
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForReadOnlyObservableCollectionProperty,

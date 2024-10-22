@@ -26,7 +26,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             DiagnosticDescriptors.InvalidUseOfChunkAttributesRule,
             DiagnosticDescriptors.NonAbstractMemberRule,
             DiagnosticDescriptors.NonStaticMemberRule,
-            DiagnosticDescriptors.NonSupportedChunkingTypeWithChunkMemberRule
+            DiagnosticDescriptors.NonSupportedChunkingTypeWithChunkMemberRule,
+            DiagnosticDescriptors.NoGetterOnPropertyDecoratedWithChunkMemberAttributeRule,
+            DiagnosticDescriptors.NoSetterOnPropertyDecoratedWithChunkMemberAttributeRule
             ];
 
         /// <summary>
@@ -91,6 +93,23 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             foreach(var property in propertiesWithUnsupportedChunkingTypes)
             {
                 var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NonSupportedChunkingTypeWithChunkMemberRule, classDeclaration.Identifier.GetLocation(), property.Symbol.Name, 
+                    property.Symbol.Type.ToDisplayString(SymbolDisplayFormat.CSharpShortErrorMessageFormat));
+                context.ReportDiagnostic(diagnostic);
+            }
+
+            var chunkablePropertiesWithoutGetter = properties.Where(p => p.IsMemberDecoratedWithChunkMemberAttribute && !p.HasGetter);
+            var chunkablePropertiesWithoutSetter = properties.Where(p => p.IsMemberDecoratedWithChunkMemberAttribute && !p.HasSetter);
+
+            foreach (var property in chunkablePropertiesWithoutGetter)
+            { 
+                var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NoGetterOnPropertyDecoratedWithChunkMemberAttributeRule, classDeclaration.Identifier.GetLocation(), property.Symbol.Name,
+                    property.Symbol.Type.ToDisplayString(SymbolDisplayFormat.CSharpShortErrorMessageFormat));
+                context.ReportDiagnostic(diagnostic);
+            }
+
+            foreach (var property in chunkablePropertiesWithoutSetter)
+            {
+                var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NoSetterOnPropertyDecoratedWithChunkMemberAttributeRule, classDeclaration.Identifier.GetLocation(), property.Symbol.Name,
                     property.Symbol.Type.ToDisplayString(SymbolDisplayFormat.CSharpShortErrorMessageFormat));
                 context.ReportDiagnostic(diagnostic);
             }

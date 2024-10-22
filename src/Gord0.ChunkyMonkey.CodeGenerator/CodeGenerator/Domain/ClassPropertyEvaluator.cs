@@ -41,6 +41,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                     bool ignoreProperty = false;
                     bool accessibilityRequirementFulfilled = true;
                     bool isValueType = p.Type.IsValueType;
+                    bool hasGetter = p.GetMethod is not null;
+                    bool hasSetter = p.SetMethod is not null;
+
                     ImmutableArray<ITypeSymbol> genericTypeArguments = [];
 
                     var propertyType = p.Type;
@@ -95,7 +98,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         standardArrayElementType: standardArrayElementType, 
                         ignoreProperty: ignoreProperty,
                         lastValueVariableName: lastValueVariableName,
-                        temporaryListVariableName: temporaryListVariableName);
+                        temporaryListVariableName: temporaryListVariableName,
+                        hasGetter: hasGetter,
+                        hasSetter: hasSetter);
                 })
                 .Where(x => !removeIgnoredProperties || !x.IgnoreProperty)
                 .ToArray();

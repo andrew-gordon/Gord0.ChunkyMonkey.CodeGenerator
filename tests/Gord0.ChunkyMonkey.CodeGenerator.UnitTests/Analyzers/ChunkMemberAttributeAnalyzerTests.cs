@@ -2,6 +2,7 @@
 using Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
+using System.Runtime.CompilerServices;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Analyzers
 {
@@ -121,6 +122,61 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Analyzers
                     .WithMessage("ChunkMemberAtribute cannot be applied to member 'Name' with a type that ChunkyMonkey cannot chunk ('string'). See https://github.com/andrew-gordon/Gord0.ChunkyMonkey.CodeGenerator for a list of supported types.")
                     .WithSpan(4, 23, 4, 32)
                     .WithArguments("Name", "string"));
+
+            await test.RunAsync();
+        }
+
+        [Fact]
+        public async Task ChunkMemberAttributeAnalyzer_WhenPropertyHasNoGetter_NoGetterOnPropertyDecoratedWithChunkMemberAttributeRuleIsFired()
+        {
+            const string testCode =
+                """
+                #nullable enable 
+                using Gord0.ChunkMonkey.Attributes;
+
+                public class TestClass
+                {
+                    [ChunkMember]
+                    public int[]? Numbers { set; }
+                }
+                """;
+
+            var test = AnalyzerTestHelper.CreateAnalyzerTest<ChunkMemberAttributeAnalyzer>(testCode);
+
+            test.ExpectedDiagnostics.Add(
+                new DiagnosticResult(DiagnosticDescriptors.NoGetterOnPropertyDecoratedWithChunkMemberAttributeRule.Id, DiagnosticSeverity.Error)
+                    .WithMessage("ChunkAttribute must only be applied to a property with a getter")
+                    .WithSpan(4, 14, 4, 23)
+                    .WithArguments("Numbers", "int[]?"));
+
+            test.ExpectedDiagnostics.Add(
+                DiagnosticResult.CompilerError("CS8051").WithSpan(7, 29, 7, 32));
+
+            await test.RunAsync();
+        }
+
+        [Fact]
+        public async Task ChunkMemberAttributeAnalyzer_WhenPropertyHasNoSetter_NoSetterOnPropertyDecoratedWithChunkMemberAttributeRuleIsFired()
+        {
+            const string testCode =
+                """
+                #nullable enable 
+                using Gord0.ChunkMonkey.Attributes;
+
+                public class TestClass
+                {
+                    [ChunkMember]
+                    public int[]? Numbers { get; }
+                }
+                """;
+
+            var test = AnalyzerTestHelper.CreateAnalyzerTest<ChunkMemberAttributeAnalyzer>(testCode);
+
+            test.ExpectedDiagnostics.Add(
+                new DiagnosticResult(DiagnosticDescriptors.NoSetterOnPropertyDecoratedWithChunkMemberAttributeRule.Id, DiagnosticSeverity.Error)
+                    .WithMessage("ChunkAttribute must only be applied to a property with a setter")
+                    .WithSpan(4, 14, 4, 23)
+                    .WithArguments("Numbers", "int[]?"));
 
             await test.RunAsync();
         }

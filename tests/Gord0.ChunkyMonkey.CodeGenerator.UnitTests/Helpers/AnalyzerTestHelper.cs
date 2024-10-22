@@ -27,7 +27,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Helpers
             test.TestState.AdditionalReferences.Add(typeof(ChunkMemberAttribute).Assembly);
             test.TestState.ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
             test.DisabledDiagnostics.Add("CS1591"); // xml comments
-            test.DisabledDiagnostics.Add("CS8618"); // Non-nullable property is uninitialized.        
+            test.DisabledDiagnostics.Add("CS8618"); // Non-nullable property is uninitialized.
             return test;
         }
     }
