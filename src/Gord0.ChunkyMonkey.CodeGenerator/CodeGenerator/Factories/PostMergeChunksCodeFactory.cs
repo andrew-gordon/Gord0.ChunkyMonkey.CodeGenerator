@@ -14,12 +14,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
         internal string ForArrayProperty(PropertyRecord propertyRecord)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"            if ({propertyRecord.TemporaryListVariableNameForArray} is not null)");
+            sb.AppendLine($"            if ({propertyRecord.TemporaryListVariableName} is not null)");
             sb.AppendLine($"            {{");
-            sb.AppendLine($"                instance.{propertyRecord.Symbol.Name} = {propertyRecord.TemporaryListVariableNameForArray}.ToArray();");
+            sb.AppendLine($"                instance.{propertyRecord.Symbol.Name} = {propertyRecord.TemporaryListVariableName}.ToArray();");
             sb.AppendLine($"            }}");
             sb.AppendLine($"            else");
-            var value = (propertyRecord.Symbol.Type.NullableAnnotation == Microsoft.CodeAnalysis.NullableAnnotation.Annotated) ? "null" : "[]";
+            var value = (propertyRecord.Symbol.Type.NullableAnnotation == NullableAnnotation.Annotated) ? "null" : "[]";
             sb.AppendLine($"            {{");
             sb.AppendLine($"                instance.{propertyRecord.Symbol.Name} = {value};");
             sb.AppendLine($"            }}");
@@ -30,44 +30,38 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
         {
             var genericType = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             var sb = new StringBuilder();
-            sb.AppendLine($"            if ({propertyRecord.TemporaryListVariableNameForArray} is not null)");
+            sb.AppendLine($"            if ({propertyRecord.TemporaryListVariableName} is not null)");
             sb.AppendLine($"            {{");
-            sb.AppendLine($"                instance.{propertyRecord.Symbol.Name} = new ArraySegment<{genericType}>({propertyRecord.TemporaryListVariableNameForArray}.ToArray());");
+            sb.AppendLine($"                instance.{propertyRecord.Symbol.Name} = new ArraySegment<{genericType}>({propertyRecord.TemporaryListVariableName}.ToArray());");
             sb.AppendLine($"            }}");
             sb.AppendLine($"            else");
-            var value = (propertyRecord.Symbol.Type.NullableAnnotation == Microsoft.CodeAnalysis.NullableAnnotation.Annotated) ? "null" : "[]";
+            var value = (propertyRecord.Symbol.Type.NullableAnnotation == NullableAnnotation.Annotated) ? "null" : "[]";
             sb.AppendLine($"            {{");
             sb.AppendLine($"                instance.{propertyRecord.Symbol.Name} = {value};");
             sb.AppendLine($"            }}");
             return sb.ToString();
         }
 
-        internal string ForImmutableArrayProperty(PropertyRecord propertyRecord)
+        internal string ForGenericImmutableCollectionProperty(PropertyRecord propertyRecord)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"            instance.{propertyRecord.Symbol.Name} = ({propertyRecord.TemporaryListVariableNameForArray} ?? []).ToImmutableArray();");
+            sb.AppendLine($"            instance.{propertyRecord.Symbol.Name} = ({propertyRecord.TemporaryListVariableName} ?? []).To{propertyRecord.TypeNameOnly}();");
             return sb.ToString();
         }
 
-        internal string ForImmutableHashSetProperty(PropertyRecord propertyRecord)
-        {
+        internal string ForGenericCollectionProperty(PropertyRecord propertyRecord)
+        { 
             var sb = new StringBuilder();
-            sb.AppendLine($"            instance.{propertyRecord.Symbol.Name} = ({propertyRecord.TemporaryListVariableNameForArray} ?? []).ToImmutableHashSet();");
+            sb.AppendLine($"            instance.{propertyRecord.Symbol.Name} = new {propertyRecord.TypeNameOnly}<{propertyRecord.TypeArgsCommaSeparatedString}>({propertyRecord.TemporaryListVariableName} ?? []);");
             return sb.ToString();
         }
 
-        internal string ForImmutableListProperty(PropertyRecord propertyRecord)
+        internal string ForReadOnlyObservableCollectionProperty(PropertyRecord propertyRecord)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"            instance.{propertyRecord.Symbol.Name} = ({propertyRecord.TemporaryListVariableNameForArray} ?? []).ToImmutableList();");
-            return sb.ToString();
-        }
-
-        internal string ForReadOnlyCollectionyProperty(PropertyRecord propertyRecord)
-        {
-            var genericType = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-            var sb = new StringBuilder();
-            sb.AppendLine($"            instance.{propertyRecord.Symbol.Name} = new ReadOnlyCollection<{genericType}>({propertyRecord.TemporaryListVariableNameForArray} ?? []);");
+            sb.AppendLine($"            var observableCollection = {propertyRecord.TemporaryListVariableName} is null ? null : new ObservableCollection<{propertyRecord.TypeArgsCommaSeparatedString}>({propertyRecord.TemporaryListVariableName});");
+            sb.AppendLine($"            var readOnlyObservableCollection = observableCollection is not null ? new ReadOnlyObservableCollection<{propertyRecord.TypeArgsCommaSeparatedString}>(observableCollection) : null;");
+            sb.AppendLine($"            instance.{propertyRecord.Symbol.Name} = readOnlyObservableCollection;");
             return sb.ToString();
         }
     }

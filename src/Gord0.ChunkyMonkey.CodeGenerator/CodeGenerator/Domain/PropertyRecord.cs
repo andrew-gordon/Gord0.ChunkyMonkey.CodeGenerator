@@ -20,8 +20,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         ITypeSymbol? standardArrayElementType,
         bool ignoreProperty,
         string lastValueVariableName,
-        string? temporaryListVariableNameForArray)
+        string? temporaryListVariableName)
     {
+        private static readonly SymbolDisplayFormat typeNameOnlyFormat = new(
+                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly,
+                genericsOptions: SymbolDisplayGenericsOptions.None);
+
         /// <summary>
         /// Gets or sets the symbol of the property.
         /// </summary>
@@ -62,7 +66,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         /// Gets or sets the temporary variable name for the array.
         /// </summary>
         /// <value>The temporary variable name for the array.</value>
-        public string? TemporaryListVariableNameForArray { get; set; } = temporaryListVariableNameForArray;
+        public string? TemporaryListVariableName { get; set; } = temporaryListVariableName;
 
         /// <summary>
         /// Gets a value indicating whether the property is an array.
@@ -105,5 +109,17 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         /// </summary>
         /// <value>The generic type arguments.</value>
         public ImmutableArray<ITypeSymbol> GenericTypeArguments => genericTypeArguments;
+
+        /// <summary>
+        /// Gets the type name of the property without qualification.
+        /// </summary>
+        /// <value>The type name of the property without qualification.</value>
+        public string TypeNameOnly => Symbol.Type.ToDisplayString(typeNameOnlyFormat);
+
+        /// <summary>
+        /// Gets the type arguments as a comma-separated string.
+        /// </summary>
+        /// <value>The type arguments as a comma-separated string.</value>
+        public string TypeArgsCommaSeparatedString = string.Join(", ", genericTypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)));
     }
 }

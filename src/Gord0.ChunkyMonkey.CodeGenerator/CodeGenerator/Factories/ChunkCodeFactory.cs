@@ -88,10 +88,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                    if (this.{propertyRecord.Symbol.Name} is not null)");
             sb.AppendLine($"                    {{");
             sb.AppendLine($"                        var chunkPairs = this.{propertyRecord.Symbol.Name}.Skip(i).Take(chunkSize);");
+            sb.AppendLine($"");
             sb.AppendLine($"                        foreach(var kvp in chunkPairs)");
             sb.AppendLine($"                        {{");
             sb.AppendLine($"                            dict.Add(kvp.Key, kvp.Value);");
             sb.AppendLine($"                        }}");
+            sb.AppendLine($"");
             sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = dict;");
             sb.AppendLine($"                    }}");
             sb.AppendLine($"                }}");
@@ -127,7 +129,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                {{");
             sb.AppendLine($"                    if (this.{propertyRecord.Symbol.Name} is not null)");
             sb.AppendLine($"                    {{");
-            sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = new ReadOnlyCollection<{genericType}>(this.{propertyRecord.Symbol.Name}.Skip(i).Take(chunkSize).ToList());");
+            sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = new {propertyRecord.Symbol.Type.Name}<{genericType}>(this.{propertyRecord.Symbol.Name}.Skip(i).Take(chunkSize).ToList());");
             sb.AppendLine($"                    }}");
             sb.AppendLine($"                }}");
             return sb.ToString();
@@ -154,6 +156,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                    var tempValues = this.{propertyRecord.Symbol.Name}.Cast<string>().Skip(i).Take(chunkSize).ToArray();");
             sb.AppendLine($"                    var sc = new StringCollection();");
             sb.AppendLine($"                    sc.AddRange(tempValues);");
+            sb.AppendLine($"");
             sb.AppendLine($"                    instance.{propertyRecord.Symbol.Name} = sc;");
             sb.AppendLine($"                }}");
             return sb.ToString();
@@ -170,10 +173,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                    if (this.{propertyRecord.Symbol.Name} is not null)");
             sb.AppendLine($"                    {{");
             sb.AppendLine($"                        var chunkPairs = this.{propertyRecord.Symbol.Name}.Skip(i).Take(chunkSize);");
+            sb.AppendLine($"");
             sb.AppendLine($"                        foreach(var kvp in chunkPairs)");
             sb.AppendLine($"                        {{");
             sb.AppendLine($"                            sortedList.Add(kvp.Key, kvp.Value);");
             sb.AppendLine($"                        }}");
+            sb.AppendLine($"");
             sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = sortedList;");
             sb.AppendLine($"                    }}");
             sb.AppendLine($"                }}");
@@ -191,10 +196,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                    if (this.{propertyRecord.Symbol.Name} is not null)");
             sb.AppendLine($"                    {{");
             sb.AppendLine($"                        var chunkPairs = this.{propertyRecord.Symbol.Name}.Skip(i).Take(chunkSize);");
+            sb.AppendLine($"");
             sb.AppendLine($"                        foreach(var kvp in chunkPairs)");
             sb.AppendLine($"                        {{");
             sb.AppendLine($"                            sortedList.Add(kvp.Key, kvp.Value);");
             sb.AppendLine($"                        }}");
+            sb.AppendLine($"");
             sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = sortedList;");
             sb.AppendLine($"                    }}");
             sb.AppendLine($"                }}");
@@ -211,14 +218,21 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                    {{");
 
             // Use deferred execution for large NameValueCollection instances
-            sb.AppendLine($"                        var keyValuePairs = (this.{propertyRecord.Symbol.Name}.{propertyRecord.TypeRecord!.LengthPropertyName} > 20000)");
-            sb.AppendLine($"                            ? this.{propertyRecord.Symbol.Name}.AllKeys.SelectMany(key => this.{propertyRecord.Symbol.Name}.GetValues(key).Select(value => new {{ Key = key, Value = value }}))");
-            sb.AppendLine($"                            : this.{propertyRecord.Symbol.Name}.AllKeys.SelectMany(key => this.{propertyRecord.Symbol.Name}.GetValues(key).Select(value => new {{ Key = key, Value = value }})).ToArray();");
-            sb.AppendLine($"                        var chunkPairs = keyValuePairs.Skip(i).Take(chunkSize);");
+            sb.AppendLine($"                        var keyValuePairs = this.{propertyRecord.Symbol.Name}?.AllKeys?");
+            sb.AppendLine($"                            .Where(key => key != null)");
+            sb.AppendLine($"                            .SelectMany(key => (this.{propertyRecord.Symbol.Name}.GetValues(key) ?? Array.Empty<string>())");
+            sb.AppendLine($"                            .Where(value => value != null)");
+            sb.AppendLine($"                            .Select(value => new KeyValuePair<string, string>(key!, value!)))");
+            sb.AppendLine($"                            .ToArray() ?? Array.Empty<KeyValuePair<string, string>>();");
+            sb.AppendLine($"");
+            sb.AppendLine($"                        var chunkPairs = keyValuePairs.Skip(i).Take(chunkSize)");
+            sb.AppendLine($"                            .Where(kvp => kvp.Key is not null & kvp.Value is not null);");
+            sb.AppendLine($"");
             sb.AppendLine($"                        foreach(var kvp in chunkPairs)");
             sb.AppendLine($"                        {{");
-            sb.AppendLine($"                            nameValueCollection.Add(kvp.Key, kvp.Value);");
+            sb.AppendLine($"                            nameValueCollection?.Add(kvp.Key!, kvp.Value!);");
             sb.AppendLine($"                        }}");
+            sb.AppendLine($"");
             sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = nameValueCollection;");
             sb.AppendLine($"                    }}");
             sb.AppendLine($"                }}");
@@ -245,6 +259,22 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                if (this.{propertyRecord.Symbol.Name} is not null)");
             sb.AppendLine($"                {{");
             sb.AppendLine($"                    instance.{propertyRecord.Symbol.Name} = new {propertyRecord.Symbol.Type.Name}<{genericType}>(this.{propertyRecord.Symbol.Name}.Skip(i).Take(chunkSize).ToList());");
+            sb.AppendLine($"                }}");
+            return sb.ToString();
+        }
+
+        internal string ForReadOnlyObservableCollectionProperty(PropertyRecord propertyRecord)
+        {
+            var genericType = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var sb = new StringBuilder();
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    if (this.{propertyRecord.Symbol.Name} is not null)");
+            sb.AppendLine($"                    {{");
+            sb.AppendLine($"                        var chunkList = this.{propertyRecord.Symbol.Name}.Skip(i).Take(chunkSize).ToList();");
+            sb.AppendLine($"                        var observableCollection = new ObservableCollection<{genericType}>(chunkList);");
+            sb.AppendLine($"");
+            sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = new {propertyRecord.Symbol.Type.Name}<{genericType}>(observableCollection);");
+            sb.AppendLine($"                    }}");
             sb.AppendLine($"                }}");
             return sb.ToString();
         }

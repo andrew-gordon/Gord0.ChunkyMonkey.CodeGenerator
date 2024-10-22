@@ -78,7 +78,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
 
                     var lastValueVariableName = "lastValue_" + p.Name;
                     var requiresTemporaryListForMergingChunks = typeRule?.RequiresTemporaryListForMergingChunks ?? false;
-                    var temporaryListVariableNameForArray = requiresTemporaryListForMergingChunks ? lastValueVariableName : null;
+                    var temporaryListVariableName = requiresTemporaryListForMergingChunks ? "list_" + p.Name : null;
 
                     var standardArrayElementType = isArray ? ((IArrayTypeSymbol)p.Type).ElementType : null;
 
@@ -95,7 +95,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         standardArrayElementType: standardArrayElementType, 
                         ignoreProperty: ignoreProperty,
                         lastValueVariableName: lastValueVariableName,
-                        temporaryListVariableNameForArray: temporaryListVariableNameForArray);
+                        temporaryListVariableName: temporaryListVariableName);
                 })
                 .Where(x => !removeIgnoredProperties || !x.IgnoreProperty)
                 .ToArray();

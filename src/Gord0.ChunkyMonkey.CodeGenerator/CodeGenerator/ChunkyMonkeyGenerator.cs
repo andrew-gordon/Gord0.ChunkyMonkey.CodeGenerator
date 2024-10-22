@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Text;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
@@ -62,6 +63,22 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
 
                     spc.AddSource(generatedSourceFilename, SourceText.From(generatedCode, Encoding.UTF8));
                     usedFileNames.Add(generatedSourceFilename);
+
+                    var diagnosticDescriptor = new DiagnosticDescriptor(
+                        "CMG001",
+                        "ChunkyMonkey",
+                        $"ChunkyMonkey generated code for class '{classRecord!.Name}'",
+                        "ChunkyMonkey",
+                        DiagnosticSeverity.Info,
+                        true);
+
+                    var diagnostic = Diagnostic.Create(
+                        diagnosticDescriptor,                        
+                        Location.None,
+                        classRecord!.Name,
+                        generatedSourceFilename);
+
+                    spc.ReportDiagnostic(diagnostic);
                 }
             });
         }       
@@ -177,6 +194,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator
             sb.AppendLine($"                yield return instance;");
             sb.AppendLine($"            }}");
             sb.AppendLine($"        }}");
+
             sb.AppendLine("");
 
             sb.AppendLine($"        /// <summary>");

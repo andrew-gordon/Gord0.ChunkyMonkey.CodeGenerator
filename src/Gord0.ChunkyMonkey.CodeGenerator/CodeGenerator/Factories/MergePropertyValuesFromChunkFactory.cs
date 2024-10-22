@@ -7,19 +7,19 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
     /// <summary>
     /// Produces code to set the value of a property on an instance by merging the value of the property from a chunk.
     /// </summary>
-    internal class MergePopertyValuesFromChunkFactory
+    internal class MergePropertyValuesFromChunkFactory
     {
         internal string ForArrayProperty(PropertyRecord propertyRecord)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"                if (chunk.{propertyRecord.Symbol.Name} is not null)");
             sb.AppendLine($"                {{");
-            sb.AppendLine($"                    if ({propertyRecord.TemporaryListVariableNameForArray} is null)");
+            sb.AppendLine($"                    if ({propertyRecord.TemporaryListVariableName} is null)");
             sb.AppendLine($"                    {{");
-            sb.AppendLine($"                        {propertyRecord.TemporaryListVariableNameForArray} = [];");
+            sb.AppendLine($"                        {propertyRecord.TemporaryListVariableName} = [];");
             sb.AppendLine($"                    }}");
             sb.AppendLine($"");
-            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableNameForArray}.AddRange(chunk.{propertyRecord.Symbol.Name});");
+            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableName}.AddRange(chunk.{propertyRecord.Symbol.Name});");
             sb.AppendLine($"                }}");
             return sb.ToString();
         }
@@ -27,12 +27,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
         internal string ForImmutableArrayProperty(PropertyRecord propertyRecord)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"                if ({propertyRecord.TemporaryListVariableNameForArray} is null)");
+            sb.AppendLine($"                if ({propertyRecord.TemporaryListVariableName} is null)");
             sb.AppendLine($"                {{");
-            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableNameForArray} = [];");
+            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableName} = [];");
             sb.AppendLine($"                }}");
             sb.AppendLine($"");
-            sb.AppendLine($"                {propertyRecord.TemporaryListVariableNameForArray}.AddRange(chunk.{propertyRecord.Symbol.Name});");
+            sb.AppendLine($"                {propertyRecord.TemporaryListVariableName}.AddRange(chunk.{propertyRecord.Symbol.Name});");
             return sb.ToString();
         }
 
@@ -70,6 +70,22 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                    {{");
             sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name}.Add(value);");
             sb.AppendLine($"                    }}");
+            sb.AppendLine($"                }}");
+            return sb.ToString();
+        }
+
+        internal string ForImmutableHashSetProperty(PropertyRecord propertyRecord)
+        {
+            var genericType = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var sb = new StringBuilder();
+            sb.AppendLine($"                if (chunk.{propertyRecord.Symbol.Name} is not null)");
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    if ({propertyRecord.TemporaryListVariableName} is null)");
+            sb.AppendLine($"                    {{");
+            sb.AppendLine($"                        {propertyRecord.TemporaryListVariableName} = [];");
+            sb.AppendLine($"                    }}");
+            sb.AppendLine($"");
+            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableName}.AddRange(chunk.{propertyRecord.Symbol.Name});");
             sb.AppendLine($"                }}");
             return sb.ToString();
         }
@@ -135,28 +151,16 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             return sb.ToString();
         }
 
-        internal string ForReadOnlyCollectionProperty(PropertyRecord propertyRecord)
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine($"                if ({propertyRecord.TemporaryListVariableNameForArray} is null)");
-            sb.AppendLine($"                {{");
-            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableNameForArray} = [];");
-            sb.AppendLine($"                }}");
-            sb.AppendLine($"");
-            sb.AppendLine($"                {propertyRecord.TemporaryListVariableNameForArray}.AddRange(chunk.{propertyRecord.Symbol.Name});");
-            return sb.ToString();
-        }
-
         internal string ForArraySegmentProperty(PropertyRecord propertyRecord)
         {
             var genericType = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
             var sb = new StringBuilder();
-            sb.AppendLine($"                if ({propertyRecord.TemporaryListVariableNameForArray} is null)");
+            sb.AppendLine($"                if ({propertyRecord.TemporaryListVariableName} is null)");
             sb.AppendLine($"                {{");
-            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableNameForArray} = new List<{genericType}>();");
+            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableName} = new List<{genericType}>();");
             sb.AppendLine($"                }}");
             sb.AppendLine($"");
-            sb.AppendLine($"                {propertyRecord.TemporaryListVariableNameForArray}.AddRange(chunk.{propertyRecord.Symbol.Name});");
+            sb.AppendLine($"                {propertyRecord.TemporaryListVariableName}.AddRange(chunk.{propertyRecord.Symbol.Name});");
             return sb.ToString();
         }
 
@@ -166,12 +170,12 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             var sb = new StringBuilder();
             sb.AppendLine($"                if (chunk.{propertyRecord.Symbol.Name} is not null)");
             sb.AppendLine($"                {{");
-            sb.AppendLine($"                    if ({propertyRecord.TemporaryListVariableNameForArray} is null)");
+            sb.AppendLine($"                    if ({propertyRecord.TemporaryListVariableName} is null)");
             sb.AppendLine($"                    {{");
-            sb.AppendLine($"                        {propertyRecord.TemporaryListVariableNameForArray} = [];");
+            sb.AppendLine($"                        {propertyRecord.TemporaryListVariableName} = [];");
             sb.AppendLine($"                    }}");
             sb.AppendLine($"");
-            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableNameForArray}.AddRange(chunk.{propertyRecord.Symbol.Name});");
+            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableName}.AddRange(chunk.{propertyRecord.Symbol.Name});");
             sb.AppendLine($"                }}");
             return sb.ToString();
         }
@@ -236,36 +240,26 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
 
         internal string ForNameValueCollectionProperty(PropertyRecord propertyRecord)
         {
+            const string elementType = "string";
+            const string kvpType = "KeyValuePair<string, string>";
+
             var sb = new StringBuilder();
             sb.AppendLine($"                    if (instance.{propertyRecord.Symbol.Name} is null)");
             sb.AppendLine($"                    {{");
             sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = new {propertyRecord.Symbol.Type.Name}();");
             sb.AppendLine($"                    }}");
             sb.AppendLine($"");
-            sb.AppendLine($"                    if (chunk.{propertyRecord.Symbol.Name} is not null)");
-            sb.AppendLine($"                    {{");
-            sb.AppendLine($"                        var keyValuePairs = chunk.{propertyRecord.Symbol.Name}.AllKeys.SelectMany(key => (instance.{propertyRecord.Symbol.Name}.GetValues(key) ?? []).Select(value => new {{ Key = key, Value = value }})).ToArray();");
-            sb.AppendLine($"                        foreach(var kvp in keyValuePairs)");
-            sb.AppendLine($"                        {{");
-            sb.AppendLine($"                            instance.{propertyRecord.Symbol.Name}.Add(kvp.Key, kvp.Value);");
-            sb.AppendLine($"                        }}");
-            sb.AppendLine($"                    }}");
-            return sb.ToString();
-        }
-
-        internal string ForImmutableHashSetProperty(PropertyRecord propertyRecord)
-        {
-            var genericType = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-            var sb = new StringBuilder();
-            sb.AppendLine($"                if (chunk.{propertyRecord.Symbol.Name} is not null)");
-            sb.AppendLine($"                {{");
-            sb.AppendLine($"                    if ({propertyRecord.TemporaryListVariableNameForArray} is null)");
-            sb.AppendLine($"                    {{");
-            sb.AppendLine($"                        {propertyRecord.TemporaryListVariableNameForArray} = [];");
-            sb.AppendLine($"                    }}");
+            sb.AppendLine($"                    var keyValuePairs = chunk?.{propertyRecord.Symbol.Name}?.AllKeys?");
+            sb.AppendLine($"                        .Where(key => key != null)");
+            sb.AppendLine($"                        .SelectMany(key => (instance?.{propertyRecord.Symbol.Name}?.GetValues(key) ?? Array.Empty<{elementType}>())");
+            sb.AppendLine($"                        .Where(value => value != null)");
+            sb.AppendLine($"                        .Select(value => new {kvpType}(key!, value!)))");
+            sb.AppendLine($"                        .ToArray() ?? Array.Empty<{kvpType}>();");
             sb.AppendLine($"");
-            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableNameForArray}.AddRange(chunk.{propertyRecord.Symbol.Name});");
-            sb.AppendLine($"                }}");
+            sb.AppendLine($"                    foreach(var kvp in keyValuePairs)");
+            sb.AppendLine($"                    {{");
+            sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name}.Add(kvp.Key, kvp.Value);");
+            sb.AppendLine($"                    }}");
             return sb.ToString();
         }
 
@@ -280,13 +274,43 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = new {propertyRecord.Symbol.Type.Name}<{genericType}>();");
             sb.AppendLine($"                    }}");
             sb.AppendLine($"");
-            sb.AppendLine($"                    if (chunk.{propertyRecord.Symbol.Name} is not null)");
+            sb.AppendLine($"                    if (chunk is not null && chunk.{propertyRecord.Symbol.Name} is not null)");
             sb.AppendLine($"                    {{");
             sb.AppendLine($"                        foreach(var value in chunk.{propertyRecord.Symbol.Name})");
             sb.AppendLine($"                        {{");
             sb.AppendLine($"                            instance.{propertyRecord.Symbol.Name}.Add(value);");
             sb.AppendLine($"                        }}");
             sb.AppendLine($"                    }}");
+            sb.AppendLine($"                }}");
+            return sb.ToString();
+        }
+
+        internal string ForReadOnlyObservableCollectionProperty(PropertyRecord propertyRecord)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"                if ({propertyRecord.TemporaryListVariableName} is null && chunk.{propertyRecord.Symbol.Name} is not null)");
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableName} = [];");
+            sb.AppendLine($"                }}");
+            sb.AppendLine($"");
+            sb.AppendLine($"                if (chunk.{propertyRecord.Symbol.Name} is not null && {propertyRecord.TemporaryListVariableName} is not null)");
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableName}.AddRange(chunk.{propertyRecord.Symbol.Name});");
+            sb.AppendLine($"                }}");
+            return sb.ToString();
+        }
+
+        internal string ForReadOnlyCollectionProperty(PropertyRecord propertyRecord)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"                if (chunk.{propertyRecord.Symbol.Name} is not null && {propertyRecord.TemporaryListVariableName} is null)");
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableName} = [];");
+            sb.AppendLine($"                }}");
+            sb.AppendLine($"");
+            sb.AppendLine($"                if (chunk.{propertyRecord.Symbol.Name} is not null && {propertyRecord.TemporaryListVariableName} is not null)");
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    {propertyRecord.TemporaryListVariableName}.AddRange(chunk.{propertyRecord.Symbol.Name});");
             sb.AppendLine($"                }}");
             return sb.ToString();
         }

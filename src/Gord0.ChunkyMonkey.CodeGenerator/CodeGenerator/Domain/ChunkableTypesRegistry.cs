@@ -25,7 +25,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         public ChunkableTypesRegistry()
         {
             var chunkCodeFactory = new ChunkCodeFactory();
-            var mergeChunksCodeFactory = new MergePopertyValuesFromChunkFactory();
+            var mergePropertyValuesFromChunkFactory = new MergePropertyValuesFromChunkFactory();
             var preMergeChunksCodeFactory = new PreMergeChunksCodeFactory();
             var postMergeChunksCodeFactory = new PostMergeChunksCodeFactory();
 
@@ -39,7 +39,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         TypeMatcher: x => x.IsGenericType("System.Collections.Generic.List<T>") && x.GetMethod != null && x.SetMethod != null,
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForListProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForListProperty,
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForListProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
 
@@ -48,7 +48,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         TypeMatcher: x => x.IsGenericType("System.Collections.ObjectModel.Collection<T>") && x.GetMethod != null && x.SetMethod != null,
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForCollectionProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForCollectionProperty,
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForCollectionProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
 
@@ -57,7 +57,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         TypeMatcher: x => x.IsGenericType("System.Collections.Generic.Dictionary<TKey, TValue>") && x.GetMethod != null && x.SetMethod != null,
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForDictionaryProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForDictionaryProperty,
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForDictionaryProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
 
@@ -67,7 +67,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         LengthPropertyName: "Length",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForArrayProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForArrayProperty,
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForArrayProperty,
                         PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForArrayProperty,
                         PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForArrayProperty),
 
@@ -77,9 +77,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForReadOnlyCollectionProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForReadOnlyCollectionProperty,
-                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForReadOnlyCollectionProperty,
-                        PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForReadOnlyCollectionyProperty),
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForReadOnlyCollectionProperty,
+                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForGenericClassProperty,
+                        PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForGenericCollectionProperty),
 
                     new TypeRecord(
                         Name: "ImmutableArray<T>",
@@ -87,9 +87,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         LengthPropertyName: "Length",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForImmutableArrayProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForImmutableArrayProperty,
-                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForImmutableArrayProperty,
-                        PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForImmutableArrayProperty),
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForImmutableArrayProperty,
+                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForGenericClassProperty,
+                        PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForGenericImmutableCollectionProperty),
 
                     new TypeRecord(
                         Name: "ImmutableList<T>",
@@ -97,16 +97,16 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForImmutableListProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForImmutableListProperty,
-                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForImmutableListProperty,
-                        PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForImmutableListProperty),
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForImmutableListProperty,
+                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForGenericClassProperty,
+                        PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForGenericImmutableCollectionProperty),
 
                     new TypeRecord(
                         Name: "HashSet<T>",
                         TypeMatcher: x => x.IsGenericType("System.Collections.Generic.HashSet<T>") && x.GetMethod != null && x.SetMethod != null,
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForHashSetProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForHashSetProperty,
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForHashSetProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
 
@@ -115,7 +115,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         TypeMatcher: x => x.IsGenericType("System.Collections.Generic.SortedSet<T>") && x.GetMethod != null && x.SetMethod != null,
                         LengthPropertyName: "Count",
                         ChunkCodeFactory: chunkCodeFactory.ForSortedSetProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForSortedSetProperty,
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForSortedSetProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
 
@@ -125,8 +125,8 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForArraySegmentProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForArraySegmentProperty,
-                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForArraySegmentProperty,
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForArraySegmentProperty,
+                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForGenericClassProperty,
                         PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForArraySegmentProperty),
 
                     new TypeRecord(
@@ -135,7 +135,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: false,
                         ChunkCodeFactory: chunkCodeFactory.ForStringCollectionProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForStringCollectionProperty,
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForStringCollectionProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
 
@@ -145,7 +145,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: false,
                         ChunkCodeFactory: chunkCodeFactory.ForSortedListProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForSortedListProperty,
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForSortedListProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
 
@@ -155,7 +155,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: false,
                         ChunkCodeFactory: chunkCodeFactory.ForSortedDictionaryProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForSortedDictionaryProperty,
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForSortedDictionaryProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
 
@@ -165,7 +165,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: false,
                         ChunkCodeFactory: chunkCodeFactory.ForNameValueCollectionProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForNameValueCollectionProperty,
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForNameValueCollectionProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
 
@@ -175,9 +175,9 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForImmutableHashSetProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForImmutableHashSetProperty,
-                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForImmutableHashSetProperty,
-                        PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForImmutableHashSetProperty),
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForImmutableHashSetProperty,
+                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForGenericClassProperty,
+                        PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForGenericImmutableCollectionProperty),
 
                     new TypeRecord(
                         Name: "System.Collections.ObjectModel.ObservableCollection<T>",
@@ -185,9 +185,19 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         LengthPropertyName: "Count",
                         RequiresTemporaryListForMergingChunks: true,
                         ChunkCodeFactory: chunkCodeFactory.ForObservableCollectionProperty,
-                        MergePopertyValuesFromChunkFactory: mergeChunksCodeFactory.ForObservableCollectionProperty,
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForObservableCollectionProperty,
                         PreMergeChunksCodeFactory: null,
                         PostMergeChunksCodeFactory: null),
+
+                    new TypeRecord(
+                        Name: "System.Collections.ObjectModel.ReadOnlyObservableCollection<T>",
+                        TypeMatcher: x => x.IsGenericType("System.Collections.ObjectModel.ReadOnlyObservableCollection<T>") && x.GetMethod != null && x.SetMethod != null,
+                        LengthPropertyName: "Count",
+                        RequiresTemporaryListForMergingChunks: true,
+                        ChunkCodeFactory: chunkCodeFactory.ForReadOnlyObservableCollectionProperty,
+                        MergePopertyValuesFromChunkFactory: mergePropertyValuesFromChunkFactory.ForReadOnlyObservableCollectionProperty,
+                        PreMergeChunksCodeFactory: preMergeChunksCodeFactory.ForGenericClassProperty,
+                        PostMergeChunksCodeFactory: postMergeChunksCodeFactory.ForReadOnlyObservableCollectionProperty),
                 ]);
 
                 typeRecords = new ReadOnlyCollection<TypeRecord>(list);

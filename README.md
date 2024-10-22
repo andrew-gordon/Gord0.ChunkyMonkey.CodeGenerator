@@ -20,6 +20,7 @@ ChunkyMonkey is a C# code generator that generates code, at build time, to split
 - `System.Collections.ObjectModel.Collection<T>`
 - `System.Collections.ObjectModel.ObservableCollection<T>`
 - `System.Collections.ObjectModel.ReadOnlyCollection<T>`
+- `System.Collections.ObjectModel.ReadOnlyObservableCollection<TKey>`
 - `System.Collections.Specialized.NameValueCollection`
 - `System.Collections.Specialized.StringCollection`
 
@@ -326,7 +327,6 @@ This generated method merges a set of chunks back into a single instance.
 - Support `System.Collections.Generic.Queue<T>`
 - Support `System.Collections.Generic.PriorityQueue<T>`
 - Support `System.Collections.Specialized.BitArray`
-- Support `System.Collections.ObjectModel.ReadOnlyObservableCollection<TKey>`
 - Support `Memory<T>`
 - Support `ReadOnlyMemory<T>`
 - Analyzer warning when `[Chunk]` is used on a class containing a collection property without a getter and setter.
@@ -360,4 +360,4 @@ This generated method merges a set of chunks back into a single instance.
 | 2.0.20  | README update in Future Enhancements section |
 | 2.0.21  | Added support for `System.Collections.Immutable.ImmutableHashSet` |
 | 2.0.22  | Added support for `System.Collections.ObjectModel.ObservableCollection<T>` |
-| 2.0.23  | Added support for `System.Collections.ObjectModel.ReadOnlyObservableCollection<TKey>` |
+| 2.0.23  | Added support for `System.Collections.ObjectModel.ReadOnlyObservableCollection<TKey>`<br>PropertyRecord.TemporaryListVariableNameForArray -> PropertyRecord.TemporaryListVariableName.<br>Corrected typo in class name for MergePropertyValuesFromChunkFactory.<br>Simplified code factory classes. |
