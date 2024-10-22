@@ -741,5 +741,44 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests
             Assert.Equal(expected1, result[0].Values);
             Assert.Equal(expected2, result[1].Values);
         }
+
+        [Fact]
+        public void Chunk_ObservableCollectionProperty_ReturnsChunkedInstances()
+        {
+            // Arrange
+            var instance = new Chunk_ClassWithObservableCollectionProperty
+            {
+                Name = "John",
+                Age = 25,
+                Numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            };
+            int chunkSize = 3;
+
+            // Act
+            var result = instance.Chunk(chunkSize).ToList();
+
+
+            // Assert
+            Assert.Equal(4, result.Count);
+
+            Assert.Equal(instance.Name, result[0].Name);
+            Assert.Equal(instance.Age, result[0].Age);
+            Assert.Equal([1, 2, 3], result[0].Numbers);
+
+            Assert.Equal(instance.Name, result[1].Name);
+            Assert.Equal(instance.Age, result[1].Age);
+            Assert.Equal([4, 5, 6], result[1].Numbers);
+
+            Assert.Equal(instance.Name, result[2].Name);
+            Assert.Equal(instance.Age, result[2].Age);
+            Assert.Equal([7, 8, 9], result[2].Numbers);
+
+            Assert.Equal(instance.Name, result[3].Name);
+            Assert.Equal(instance.Age, result[3].Age);
+            Assert.Equal([10], result[3].Numbers);
+
+            Assert.Single(result.Select(x => x.Name).Distinct());
+            Assert.Single(result.Select(x => x.Age).Distinct());
+        }
     }
 }

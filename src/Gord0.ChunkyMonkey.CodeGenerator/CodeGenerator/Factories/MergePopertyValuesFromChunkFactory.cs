@@ -268,5 +268,27 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Factories
             sb.AppendLine($"                }}");
             return sb.ToString();
         }
+
+        internal string ForObservableCollectionProperty(PropertyRecord propertyRecord)
+        {
+            var genericType = propertyRecord.GenericTypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            var sb = new StringBuilder();
+            sb.AppendLine($"                if (chunk.{propertyRecord.Symbol.Name} is not null)");
+            sb.AppendLine($"                {{");
+            sb.AppendLine($"                    if (instance.{propertyRecord.Symbol.Name} is null)");
+            sb.AppendLine($"                    {{");
+            sb.AppendLine($"                        instance.{propertyRecord.Symbol.Name} = new {propertyRecord.Symbol.Type.Name}<{genericType}>();");
+            sb.AppendLine($"                    }}");
+            sb.AppendLine($"");
+            sb.AppendLine($"                    if (chunk.{propertyRecord.Symbol.Name} is not null)");
+            sb.AppendLine($"                    {{");
+            sb.AppendLine($"                        foreach(var value in chunk.{propertyRecord.Symbol.Name})");
+            sb.AppendLine($"                        {{");
+            sb.AppendLine($"                            instance.{propertyRecord.Symbol.Name}.Add(value);");
+            sb.AppendLine($"                        }}");
+            sb.AppendLine($"                    }}");
+            sb.AppendLine($"                }}");
+            return sb.ToString();
+        }
     }
 }
