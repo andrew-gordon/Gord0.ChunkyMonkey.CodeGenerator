@@ -37,11 +37,11 @@ Imagine you have a class like this:
 ```csharp
 public class CreateUserRequest
 {
-  public string Username { get; set; }
-  public DateTime DateOfBirth { get; set; }	
-  public List<int> FavouriteNumbers { get; set; }
-  public string[] FavouriteFilms { get; set; }
-  public Dictionary<string, string> Attributes { get; set; }
+    public string Username { get; set; }
+    public DateTime DateOfBirth { get; set; }	
+    public List<int> FavouriteNumbers { get; set; }
+    public string[] FavouriteFilms { get; set; }
+    public Dictionary<string, string> Attributes { get; set; }
 }
 ```
 
@@ -134,10 +134,10 @@ This generated method merges a set of chunks back into a single instance.
 
 2. There are two ways of indicating to ChunkyMonkey that you would like the `Chunk` and `MergeChunks` to be generated for a class:
 
-    | Method | Description |
-    |--------|-------------|
-    | Class-level | Add the `[Chunk]` attribute to the class for which you'd like ChunkyMonkey to generate the `Chunk` and `MergeChunks` methods. Code will be generated to chunk all public properties for supported collection types. |
-    | Property-level | Add the `[ChunkMember]` attribute to one or more properties of a class for which you'd like ChunkyMonkey to generate the `Chunk` and `MergeChunks` methods. Code will be generated to chunk the properties for supported collection types if they have been decorated with `ChunkMember`.|
+    | Method | Attribute | Description |
+    |--------|-------------|-------------|
+    | Class-level | <ul><li>`[Chunk]` _defaults to `Accessibility.Public`_</li><li>`[Chunk(Accessibility.Public)]`</li><li>`[Chunk(Accessibility.All)]` | Add the `[Chunk]` attribute to the class for which you'd like ChunkyMonkey to generate the `Chunk` and `MergeChunks` methods. Code will be generated to chunk all public properties for supported collection types. The optional Accessibility argument determines whether chunking methods will be written for all properties, or just those with public getters and setters (default)</li></ul> |
+    | Property-level | <ul><li>`[ChunkMember]`</li></ul> | Add the `[ChunkMember]` attribute to one or more properties of a class for which you'd like ChunkyMonkey to generate the `Chunk` and `MergeChunks` methods. Code will be generated to chunk the properties for supported collection types if they have been decorated with `ChunkMember`, regardless of getter and setter visibility.|
  
 
     > :bulb: **Tip:** Be sure to define the class as a `partial` class - otherwise, you will receive a compiler error when you build your project.
@@ -329,7 +329,6 @@ This generated method merges a set of chunks back into a single instance.
 - Support `System.Collections.Specialized.BitArray`
 - Support `Memory<T>`
 - Support `ReadOnlyMemory<T>`
-- Analyzer warning when `[Chunk]` is used on a class containing a collection property without a getter and setter.
 
 ## Versions
 
@@ -361,3 +360,4 @@ This generated method merges a set of chunks back into a single instance.
 | 2.0.22  | Added support for `System.Collections.ObjectModel.ObservableCollection<T>` |
 | 2.0.25  | Added support for `System.Collections.ObjectModel.ReadOnlyObservableCollection<TKey>`<br>PropertyRecord.TemporaryListVariableNameForArray -> PropertyRecord.TemporaryListVariableName.<br>Corrected typo in class name for MergePropertyValuesFromChunkFactory.<br>Simplified code factory classes. |
 | 2.0.26  | Analyzer warning when `[ChunkMember]` is applied to a collection property without a getter (`DiagnosticDescriptors.NoGetterOnPropertyDecoratedWithChunkMemberAttributeRule`)<br>Analyzer warning when `[ChunkMember]` is applied to a collection property without a setter (`DiagnosticDescriptors.NoSetterOnPropertyDecoratedWithChunkMemberAttributeRule`) |
+| 2.0.27  | Analyzer warning when `[Chunk]` is used on a class containing a collection property without an accessible getter and setter (`DiagnosticDescriptors.GetterAndSetterMissingForChunkableCollectionPropertyInClassDecoratedWithChunkAttributeRule`).<br>Analyser warning when `[ChunkMember]` is used on a class containing a collection property without a getter and setter (`DiagnosticDescriptors.NoGetterOrSetterOnPropertyDecoratedWithChunkAttributeRule`) |

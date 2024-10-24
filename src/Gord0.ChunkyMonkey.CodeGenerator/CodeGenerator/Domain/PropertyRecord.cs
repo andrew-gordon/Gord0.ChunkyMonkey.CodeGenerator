@@ -15,14 +15,18 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         bool isArray,
         bool isClassChunked,
         bool isMemberChunked,
-        bool accessibilityRequirementFulfilled,
         ImmutableArray<ITypeSymbol> genericTypeArguments,
         ITypeSymbol? standardArrayElementType,
         bool ignoreProperty,
         string lastValueVariableName,
         string? temporaryListVariableName,
         bool hasGetter,
-        bool hasSetter)
+        bool hasSetter,
+        Accessibility requiredGetterSetterAccessibility,
+        Microsoft.CodeAnalysis.Accessibility propertyGetterAccessibility,
+        Microsoft.CodeAnalysis.Accessibility propertySetterAccessibility,
+        bool getterAccessibilityFulfilled,
+        bool setterAccessibilityFulfilled)
     {
         private static readonly SymbolDisplayFormat typeNameOnlyFormat = new(
                 typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly,
@@ -57,6 +61,11 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         /// </summary>
         /// <value><c>true</c> if the property has a setter; otherwise, <c>false</c>.</value>
         public bool HasSetter { get; } = hasSetter;
+        public Accessibility RequiredGetterSetterAccessibility { get; } = requiredGetterSetterAccessibility;
+        public Microsoft.CodeAnalysis.Accessibility PropertyGetterAccessibility { get; } = propertyGetterAccessibility;
+        public Microsoft.CodeAnalysis.Accessibility PropertySetterAccessibility { get; } = propertySetterAccessibility;
+        public bool GetterAccessibilityFulfilled { get; } = getterAccessibilityFulfilled;
+        public bool SetterAccessibilityFulfilled { get; } = setterAccessibilityFulfilled;
 
         /// <summary>
         /// Gets or sets the declaration type of the property.
@@ -108,10 +117,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         public ITypeSymbol? ArrayElementType { get; } = standardArrayElementType;
 
         /// <summary>
-        /// Gets a value indicating whether the accessibility requirement is fulfilled.
+        /// Gets a value indicating whether the accessibility requirement is fulfilled for the getter and setter.
         /// </summary>
-        /// <value><c>true</c> if the accessibility requirement is fulfilled; otherwise, <c>false</c>.</value>
-        public bool AccessibilityRequirementFulfilled { get; } = accessibilityRequirementFulfilled;
+        /// <value><c>true</c> if the accessibility requirement is fulfilled for the getter and setter; otherwise, <c>false</c>.</value>
+        public bool AccessibilityRequirementFulfilled => GetterAccessibilityFulfilled && SetterAccessibilityFulfilled;
 
         /// <summary>
         /// Gets a value indicating whether the property has a supported type for chunking.

@@ -40,7 +40,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
         /// <summary>
         /// Gets a value indicating whether the class is public.
         /// </summary>
-        public bool IsPublic => ClassSymbol.DeclaredAccessibility == Accessibility.Public;
+        public bool IsPublic => ClassSymbol.DeclaredAccessibility == Microsoft.CodeAnalysis.Accessibility.Public;
 
         /// <summary>
         /// Gets a value indicating whether the class is sealed.

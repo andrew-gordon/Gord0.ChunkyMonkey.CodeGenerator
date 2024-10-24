@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Text;
 using Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain;
 using Gord0.ChunkyMonkey.CodeGenerator.Extensions;
 using Microsoft.CodeAnalysis;
@@ -8,7 +9,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
 {
-
     /// <summary>
     /// Analyzes classes with the ChunkAttribute and reports diagnostics based on specific rules.
     /// </summary>
@@ -27,11 +27,11 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
         /// </summary>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [
             DiagnosticDescriptors.NonAbstractClassRule,
-                DiagnosticDescriptors.NonStaticClassRule,
-                DiagnosticDescriptors.ClassWithParameterlessContructorRule,
-                DiagnosticDescriptors.NoChunkablePropertiesRule,
-                DiagnosticDescriptors.NoAccessibleChunkablePropertiesRule
-            ];
+            DiagnosticDescriptors.NonStaticClassRule,
+            DiagnosticDescriptors.ClassWithParameterlessContructorRule,
+            DiagnosticDescriptors.NoChunkablePropertiesRule,
+            DiagnosticDescriptors.GetterAndSetterMissingForChunkableCollectionPropertyInClassDecoratedWithChunkAttributeRule
+        ];
 
         /// <summary>
         /// Initializes the ChunkAttributeAnalyzer.
@@ -41,7 +41,6 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
         {
             context.EnableConcurrentExecution();
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
-            // Register a syntax node action for class declarations
             context.RegisterSyntaxNodeAction(AnalyzeClass, SyntaxKind.ClassDeclaration);
         }
 
@@ -60,11 +59,15 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             {
                 return;
             }
+            
+            var hasChunkAttribute = classSymbol.GetAttribute(attributeFullTypeName: AttributeFullTypeNames.Chunk) is not null;
 
-            // Check if the class has the ChunkAttribute
-            var hasCustomAttribute = classSymbol.GetAttribute(attributeFullTypeName: AttributeFullTypeNames.Chunk) is not null;
+            var classRecord = new ClassRecord(classSymbol);
+            var properties = classPropertyEvaluator.GetProperties(classRecord, removeIgnoredProperties: false);
+            var hasChunkMemberAttributeOnAtLeastOneProperty = properties.Any(x => x.IsMemberDecoratedWithChunkMemberAttribute);
 
-            if (!hasCustomAttribute)
+
+            if (!hasChunkAttribute && !hasChunkMemberAttributeOnAtLeastOneProperty)
             {
                 return;
             }
@@ -92,22 +95,64 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
                 context.ReportDiagnostic(diagnostic);
             }
 
-            var classRecord = new ClassRecord(classSymbol);
 
-            var properties = classPropertyEvaluator.GetProperties(classRecord, removeIgnoredProperties: false);
-
-            var chunkableMembers = properties.Where(p => p.HasSupportedTypeForChunking).Count();
-            var accessibleChunkableMembers = properties.Where(p => p.HasSupportedTypeForChunking && p.AccessibilityRequirementFulfilled).Count();
-            var inaccessibleChunkableMembers = properties.Where(p => p.HasSupportedTypeForChunking && !p.AccessibilityRequirementFulfilled).Count();
-
-            if (chunkableMembers > 0 && accessibleChunkableMembers == 0 && inaccessibleChunkableMembers > 0)
+            if (hasChunkMemberAttributeOnAtLeastOneProperty)
             {
-                var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NoAccessibleChunkablePropertiesRule, classDeclaration.Identifier.GetLocation());
-                context.ReportDiagnostic(diagnostic);
+                var inaccessibleChunkableProperties = properties
+                    .Where(p => p.IsMemberDecoratedWithChunkMemberAttribute &&
+                                p.HasSupportedTypeForChunking && 
+                                !p.AccessibilityRequirementFulfilled);
+
+                CheckPropertiesHaveAccessibleGetterAndSetter(context, classDeclaration, classSymbol, inaccessibleChunkableProperties);
             }
-            else if (chunkableMembers == 0)
+
+            if (hasChunkAttribute)
+            {
+                var inaccessibleChunkableProperties = properties
+                    .Where(p => p.IsClassDecoratedWithChunkAttribute &&
+                                p.HasSupportedTypeForChunking &&
+                                !p.AccessibilityRequirementFulfilled);
+
+                CheckPropertiesHaveAccessibleGetterAndSetter(context, classDeclaration, classSymbol, inaccessibleChunkableProperties);
+            }
+
+            var chunkableMembers = properties.Count(p => (p.IsClassDecoratedWithChunkAttribute || p.IsMemberDecoratedWithChunkMemberAttribute) && p.HasSupportedTypeForChunking);
+
+            if (chunkableMembers == 0)
             {
                 var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NoChunkablePropertiesRule, classDeclaration.Identifier.GetLocation());
+                context.ReportDiagnostic(diagnostic);
+            }
+        }
+
+        private void CheckPropertiesHaveAccessibleGetterAndSetter(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax classDeclaration, INamedTypeSymbol classSymbol, IEnumerable<PropertyRecord> inaccessibleChunkableProperties)
+        {
+            foreach (var property in inaccessibleChunkableProperties)
+            {
+                var sb = new StringBuilder();
+                sb.Append($"Property '{property.Symbol.Name}' does not not have ");
+
+                var parts = new List<string>();
+
+                if (property.HasGetter && !property.GetterAccessibilityFulfilled)
+                {
+                    parts.Add("a public getter (required by class ChunkAttribute)");
+                }
+
+                if (property.HasSetter && !property.SetterAccessibilityFulfilled)
+                {
+                    parts.Add("a public setter (required by class ChunkAttribute)");
+                }
+
+                sb.Append(string.Join(" and ", parts));
+
+                var diagnostic = Diagnostic.Create(
+                    DiagnosticDescriptors.GetterAndSetterMissingForChunkableCollectionPropertyInClassDecoratedWithChunkAttributeRule,
+                    classDeclaration.Identifier.GetLocation(),
+                    classSymbol.Name,
+                    property.Symbol.Name,
+                    sb.ToString());
+
                 context.ReportDiagnostic(diagnostic);
             }
         }

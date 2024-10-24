@@ -127,7 +127,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Analyzers
         }
 
         [Fact]
-        public async Task ChunkMemberAttributeAnalyzer_WhenPropertyHasNoGetter_NoGetterOnPropertyDecoratedWithChunkMemberAttributeRuleIsFired()
+        public async Task ChunkMemberAttributeAnalyzer_WhenPropertyHasNoGetter_GetterAndSetterMissingOnCollectionPropertyDecoratedWithChunkMemberAttributeRuleIsFired()
         {
             const string testCode =
                 """
@@ -144,10 +144,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Analyzers
             var test = AnalyzerTestHelper.CreateAnalyzerTest<ChunkMemberAttributeAnalyzer>(testCode);
 
             test.ExpectedDiagnostics.Add(
-                new DiagnosticResult(DiagnosticDescriptors.NoGetterOnPropertyDecoratedWithChunkMemberAttributeRule.Id, DiagnosticSeverity.Error)
-                    .WithMessage("ChunkAttribute must only be applied to a property with a getter")
+                new DiagnosticResult(DiagnosticDescriptors.GetterAndSetterMissingOnCollectionPropertyDecoratedWithChunkMemberAttributeRule.Id, DiagnosticSeverity.Error)
+                    .WithMessage("ChunkMemberAttribute must only be applied to a chunkable collection property that has an getter and setter. Property 'Numbers' does not not have a getter.")
                     .WithSpan(4, 14, 4, 23)
-                    .WithArguments("Numbers", "int[]?"));
+                    .WithArguments("Property 'Numbers' does not not have a setter."));
 
             test.ExpectedDiagnostics.Add(
                 DiagnosticResult.CompilerError("CS8051").WithSpan(7, 29, 7, 32));
@@ -156,7 +156,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Analyzers
         }
 
         [Fact]
-        public async Task ChunkMemberAttributeAnalyzer_WhenPropertyHasNoSetter_NoSetterOnPropertyDecoratedWithChunkMemberAttributeRuleIsFired()
+        public async Task ChunkMemberAttributeAnalyzer_WhenPropertyHasNoSetter_GetterAndSetterMissingOnCollectionPropertyDecoratedWithChunkMemberAttributeRuleIsFired()
         {
             const string testCode =
                 """
@@ -173,10 +173,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Analyzers
             var test = AnalyzerTestHelper.CreateAnalyzerTest<ChunkMemberAttributeAnalyzer>(testCode);
 
             test.ExpectedDiagnostics.Add(
-                new DiagnosticResult(DiagnosticDescriptors.NoSetterOnPropertyDecoratedWithChunkMemberAttributeRule.Id, DiagnosticSeverity.Error)
-                    .WithMessage("ChunkAttribute must only be applied to a property with a setter")
+                new DiagnosticResult(DiagnosticDescriptors.GetterAndSetterMissingOnCollectionPropertyDecoratedWithChunkMemberAttributeRule.Id, DiagnosticSeverity.Error)
+                    .WithMessage("ChunkMemberAttribute must only be applied to a chunkable collection property that has an getter and setter. Property 'Numbers' does not not have a setter.")
                     .WithSpan(4, 14, 4, 23)
-                    .WithArguments("Numbers", "int[]?"));
+                    .WithArguments("Property 'Numbers' does not not have a setter."));
 
             await test.RunAsync();
         }

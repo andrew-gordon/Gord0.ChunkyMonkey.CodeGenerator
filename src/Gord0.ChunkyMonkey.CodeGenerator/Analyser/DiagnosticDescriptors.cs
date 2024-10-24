@@ -96,34 +96,23 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             isEnabledByDefault: true);
 
         /// <summary>
-        /// Represents the diagnostic descriptor for the rule that warns about applying ChunkAttribute to a class without a chunkable collection property that meets the member accessibility criteria.
-        /// </summary>
-        public static readonly DiagnosticDescriptor NoAccessibleChunkablePropertiesRule = new(
-            "CMKY0009",
-            "Invalid use of ChunkAttribute on class without a chunkable collection property that meets the member accessibility criteria",
-            "ChunkAttribute must only be applied to a class with at least one chunkable collection property that meets the member accessibility criteria",
-            "Usage",
-            DiagnosticSeverity.Warning,
-            isEnabledByDefault: true);
-
-        /// <summary>
         /// Represents the diagnostic descriptor for the rule that warns about applying ChunkMemberAttribute to a property without a getter.
         /// </summary>
-        public static readonly DiagnosticDescriptor NoGetterOnPropertyDecoratedWithChunkMemberAttributeRule = new(
+        public static readonly DiagnosticDescriptor GetterAndSetterMissingOnCollectionPropertyDecoratedWithChunkMemberAttributeRule = new(
             "CMKY0010",
-            "Invalid use of ChunkMemberAttribute on a property without a getter",
-            "ChunkAttribute must only be applied to a property with a getter",
+            "Invalid use of ChunkMemberAttribute on a chunkable collection property without an getter and setter",
+            "ChunkMemberAttribute must only be applied to a chunkable collection property that has an getter and setter. {0}.",
             "Usage",
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
         /// <summary>
-        /// Represents the diagnostic descriptor for the rule that warns about applying ChunkMemberAttribute to a property without a setter.
+        /// Represents the diagnostic descriptor for the rule that warns about applying ChunkMemberAttribute to a property without a getter.
         /// </summary>
-        public static readonly DiagnosticDescriptor NoSetterOnPropertyDecoratedWithChunkMemberAttributeRule = new(
+        public static readonly DiagnosticDescriptor GetterAndSetterMissingForChunkableCollectionPropertyInClassDecoratedWithChunkAttributeRule = new(
             "CMKY0011",
-            "Invalid use of ChunkMemberAttribute on a property without a setter",
-            "ChunkAttribute must only be applied to a property with a setter",
+            "Invalid use of ChunkAttribute on a class with a chunkable collection property with no accessible getter and setter",
+            "ChunkAttribute cannot be applied to class '{0}' as it contains chunkable property '{1}' that has no accessible getter and setter. {2}.",
             "Usage",
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);

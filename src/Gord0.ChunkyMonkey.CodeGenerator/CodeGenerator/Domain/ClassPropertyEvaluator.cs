@@ -1,5 +1,6 @@
 ﻿using Gord0.ChunkyMonkey.CodeGenerator.Extensions;
 using Microsoft.CodeAnalysis;
+using System;
 using System.Collections.Immutable;
 
 namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
@@ -39,10 +40,16 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                     var isMemberChunked = chunkMemberAttribute is not null;
                     var isChunkableCollectionProperty = typeRule is not null;
                     bool ignoreProperty = false;
-                    bool accessibilityRequirementFulfilled = true;
                     bool isValueType = p.Type.IsValueType;
                     bool hasGetter = p.GetMethod is not null;
                     bool hasSetter = p.SetMethod is not null;
+
+                    var propertyGetterAccessibility = p.GetMethod?.DeclaredAccessibility ?? Microsoft.CodeAnalysis.Accessibility.NotApplicable;
+                    var propertySetterAccessibility = p.SetMethod?.DeclaredAccessibility ?? Microsoft.CodeAnalysis.Accessibility.NotApplicable;
+                    bool getterAccessibilityRequirementFulfilled = false;
+                    bool setterAccessibilityRequirementFulfilled = false;
+
+                    Accessibility requiredGetterSetterAccessibility = Accessibility.Public; // default state
 
                     ImmutableArray<ITypeSymbol> genericTypeArguments = [];
 
@@ -52,6 +59,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         genericTypeArguments = namedType.TypeArguments;
                     }
 
+
                     if (isMemberChunked)
                     {
                         ignoreProperty = false;
@@ -60,22 +68,56 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         {
                             ignoreProperty = true;
                         }
-                    }
-                    else if (isClassChunked)
-                    {
-                        var propertyAccessor = p.DeclaredAccessibility;
-                        int? attributeMemberAccessorValue = 0;
 
-                        if (chunkAttribute!.ConstructorArguments.Any())
+                        requiredGetterSetterAccessibility = Accessibility.All;
+
+                        getterAccessibilityRequirementFulfilled = true;
+                        setterAccessibilityRequirementFulfilled = true;
+                    }
+                    
+                    if (isClassChunked && isChunkableCollectionProperty)
+                    {
+                        Microsoft.CodeAnalysis.Accessibility[] nonPublicAccessibilities = [
+                            Microsoft.CodeAnalysis.Accessibility.Private,
+                            Microsoft.CodeAnalysis.Accessibility.Protected,
+                            Microsoft.CodeAnalysis.Accessibility.ProtectedAndInternal,
+                            Microsoft.CodeAnalysis.Accessibility.ProtectedOrInternal
+                        ];
+
+                        if (hasGetter)
                         {
-                            attributeMemberAccessorValue = chunkAttribute.ConstructorArguments[0].Value as int?;
+                            if (chunkAttribute!.ConstructorArguments.Any())
+                            {
+                                requiredGetterSetterAccessibility = ConvertNullableObjectToAccessibility(chunkAttribute.ConstructorArguments[0].Value);
+
+                                if (nonPublicAccessibilities.Contains(propertyGetterAccessibility) && requiredGetterSetterAccessibility == Accessibility.Public)
+                                {
+                                    ignoreProperty = true;
+                                    getterAccessibilityRequirementFulfilled = false;
+                                } 
+                                else
+                                {
+                                    getterAccessibilityRequirementFulfilled = true;
+                                }
+                            }
                         }
 
-                        Accessibility[] nonPublicAccessibilities = [Accessibility.Private, Accessibility.Protected, Accessibility.ProtectedAndInternal, Accessibility.ProtectedOrInternal];
-                        if (nonPublicAccessibilities.Contains(propertyAccessor) && attributeMemberAccessorValue == 0)
+                        if (hasSetter)
                         {
-                            ignoreProperty = true;
-                            accessibilityRequirementFulfilled = false;
+                            if (chunkAttribute!.ConstructorArguments.Any())
+                            {
+                                requiredGetterSetterAccessibility = ConvertNullableObjectToAccessibility(chunkAttribute.ConstructorArguments[0].Value);
+
+                                if (nonPublicAccessibilities.Contains(propertyGetterAccessibility) && requiredGetterSetterAccessibility == Accessibility.Public)
+                                {
+                                    ignoreProperty = true;
+                                    setterAccessibilityRequirementFulfilled = false;
+                                }
+                                else
+                                {
+                                    setterAccessibilityRequirementFulfilled = true;
+                                }
+                            }
                         }
                     }
 
@@ -93,19 +135,36 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain
                         isArray: isArray, 
                         isClassChunked: isClassChunked,
                         isMemberChunked: isMemberChunked, 
-                        accessibilityRequirementFulfilled: accessibilityRequirementFulfilled,
                         genericTypeArguments: genericTypeArguments, 
                         standardArrayElementType: standardArrayElementType, 
                         ignoreProperty: ignoreProperty,
                         lastValueVariableName: lastValueVariableName,
                         temporaryListVariableName: temporaryListVariableName,
                         hasGetter: hasGetter,
-                        hasSetter: hasSetter);
+                        hasSetter: hasSetter,
+                        propertyGetterAccessibility: propertyGetterAccessibility,
+                        propertySetterAccessibility: propertySetterAccessibility,
+                        requiredGetterSetterAccessibility: requiredGetterSetterAccessibility,
+                        getterAccessibilityFulfilled: getterAccessibilityRequirementFulfilled,
+                        setterAccessibilityFulfilled: setterAccessibilityRequirementFulfilled
+                        );
                 })
                 .Where(x => !removeIgnoredProperties || !x.IgnoreProperty)
                 .ToArray();
 
             return classProperties;
+        }
+
+        private Accessibility ConvertNullableObjectToAccessibility(object? value)
+        {
+            Accessibility accessibility = Accessibility.Public;
+
+            if (value != null && Enum.IsDefined(typeof(Accessibility), value))
+            {
+                accessibility = (Accessibility)value;
+            }
+
+            return accessibility;
         }
     }
 }

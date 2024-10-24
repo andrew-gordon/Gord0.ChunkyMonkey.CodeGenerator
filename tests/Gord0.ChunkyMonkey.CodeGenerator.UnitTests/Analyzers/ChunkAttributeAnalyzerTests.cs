@@ -39,7 +39,7 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Analyzers
         }
 
         [Fact]
-        public async Task ChunkAttributeAnalyzer_WhenNoChunkablePropertiesForSpecifiedMemberAccessor_NoChunkablePropertiesRuleIsFired()
+        public async Task ChunkAttributeAnalyzer_WhenNoChunkablePropertiesForSpecifiedMemberAccessor_GetterAndSetterMissingForChunkableCollectionPropertyInClassDecoratedWithChunkAttributeRuleIsFired()
         {
             const string testCode =
                 """
@@ -58,9 +58,10 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.UnitTests.Analyzers
             var test = AnalyzerTestHelper.CreateAnalyzerTest<ChunkAttributeAnalyzer>(testCode);
 
             test.ExpectedDiagnostics.Add(
-                new DiagnosticResult(DiagnosticDescriptors.NoAccessibleChunkablePropertiesRule.Id, DiagnosticSeverity.Warning)
-                    .WithMessage("ChunkAttribute must only be applied to a class with at least one chunkable collection property that meets the member accessibility criteria")
-                    .WithSpan(5, 29, 5, 77));
+                new DiagnosticResult(DiagnosticDescriptors.GetterAndSetterMissingForChunkableCollectionPropertyInClassDecoratedWithChunkAttributeRule.Id, DiagnosticSeverity.Warning)
+                    .WithMessage("ChunkAttribute cannot be applied to class 'Chunk_PublicFields_ClassWithPrivateArrayProperty' as it contains chunkable property 'Numbers' that has no accessible getter and setter. Property 'Numbers' does not not have a public getter (required by class ChunkAttribute) and a public setter (required by class ChunkAttribute).")
+                    .WithSpan(5, 29, 5, 77)
+                    .WithArguments("Property 'Numbers' does not not have a public getter (required by class ChunkAttribute) and a public setter (required by class ChunkAttribute)."));
 
             await test.RunAsync();
         }

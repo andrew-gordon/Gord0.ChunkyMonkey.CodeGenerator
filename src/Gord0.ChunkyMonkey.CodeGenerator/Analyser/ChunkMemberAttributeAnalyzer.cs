@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Text;
 using Gord0.ChunkyMonkey.CodeGenerator.CodeGenerator.Domain;
 using Gord0.ChunkyMonkey.CodeGenerator.Extensions;
 using Microsoft.CodeAnalysis;
@@ -27,9 +28,8 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
             DiagnosticDescriptors.NonAbstractMemberRule,
             DiagnosticDescriptors.NonStaticMemberRule,
             DiagnosticDescriptors.NonSupportedChunkingTypeWithChunkMemberRule,
-            DiagnosticDescriptors.NoGetterOnPropertyDecoratedWithChunkMemberAttributeRule,
-            DiagnosticDescriptors.NoSetterOnPropertyDecoratedWithChunkMemberAttributeRule
-            ];
+            DiagnosticDescriptors.GetterAndSetterMissingOnCollectionPropertyDecoratedWithChunkMemberAttributeRule,
+        ];
 
         /// <summary>
         /// Initializes the analyzer.
@@ -97,20 +97,32 @@ namespace Gord0.ChunkyMonkey.CodeGenerator.Analyser
                 context.ReportDiagnostic(diagnostic);
             }
 
-            var chunkablePropertiesWithoutGetter = properties.Where(p => p.IsMemberDecoratedWithChunkMemberAttribute && !p.HasGetter);
-            var chunkablePropertiesWithoutSetter = properties.Where(p => p.IsMemberDecoratedWithChunkMemberAttribute && !p.HasSetter);
+            var chunkablePropertiesWithoutGetterAndSetter = properties.Where(p => p.IsMemberDecoratedWithChunkMemberAttribute && !(p.HasGetter && p.HasSetter));
 
-            foreach (var property in chunkablePropertiesWithoutGetter)
-            { 
-                var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NoGetterOnPropertyDecoratedWithChunkMemberAttributeRule, classDeclaration.Identifier.GetLocation(), property.Symbol.Name,
-                    property.Symbol.Type.ToDisplayString(SymbolDisplayFormat.CSharpShortErrorMessageFormat));
-                context.ReportDiagnostic(diagnostic);
-            }
-
-            foreach (var property in chunkablePropertiesWithoutSetter)
+            foreach (var property in chunkablePropertiesWithoutGetterAndSetter)
             {
-                var diagnostic = Diagnostic.Create(DiagnosticDescriptors.NoSetterOnPropertyDecoratedWithChunkMemberAttributeRule, classDeclaration.Identifier.GetLocation(), property.Symbol.Name,
-                    property.Symbol.Type.ToDisplayString(SymbolDisplayFormat.CSharpShortErrorMessageFormat));
+                var sb = new StringBuilder();
+                sb.Append($"Property '{property.Symbol.Name}' does not not have ");
+
+                var parts = new List<string>();
+
+                if (!property.HasGetter)
+                {
+                    parts.Add("a getter");
+                }
+
+                if (!property.HasSetter)
+                {
+                    parts.Add("a setter");
+                }
+
+                sb.Append(string.Join(" and ", parts));
+
+                var diagnostic = Diagnostic.Create(
+                    DiagnosticDescriptors.GetterAndSetterMissingOnCollectionPropertyDecoratedWithChunkMemberAttributeRule,
+                    classDeclaration.Identifier.GetLocation(),
+                    sb.ToString());
+
                 context.ReportDiagnostic(diagnostic);
             }
         }
